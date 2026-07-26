@@ -1,4 +1,4 @@
-[versions]
+[versions]`nksp = "1.9.24-1.0.20"
 agp = "8.7.0"
 kotlin = "1.9.24"
 coreKtx = "1.13.1"
@@ -16,7 +16,7 @@ navigationCompose = "2.8.2"
 gson = "2.11.0"
 hiddenapibypass = "4.3"
 datastore = "1.1.1"
-hilt = "2.53.1"
+hilt = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 room = "2.6.1"
 retrofit = "2.11.0"
@@ -59,7 +59,7 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }`nroom-compiler-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 # Retrofit & OkHttp
@@ -89,7 +89,7 @@ lspatch = { group = "org.lsposed.lspatch", name = "lspatch", version.ref = "lspa
 # Security
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 
-[plugins]
+[plugins]`nksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
