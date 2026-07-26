@@ -19,13 +19,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 离线地图管理�?
+ * 蝳餌瑪�啣蝞∠��?
  * 
- * 功能:
- * - 瓦片地图下载
- * - 磁盘缓存管理
- * - 下载进度追踪
- * - WiFi 环境检�?
+ * �:
+ * - �衣��啣銝蝸
+ * - 蝤�蝻�蝞∠�
+ * - 銝蝸餈漲餈質葵
+ * - WiFi �臬�璉瘚?
  */
 @Singleton
 class OfflineMapManager @Inject constructor(
@@ -33,30 +33,30 @@ class OfflineMapManager @Inject constructor(
     private val mapCacheManager: MapCacheManager
 ) {
     
-    /** 下载状�?*/
+    /** 銝蝸�嗆?*/
     private val _downloadState = MutableStateFlow(DownloadState.IDLE)
     val downloadState: StateFlow<DownloadState> = _downloadState.asStateFlow()
     
-    /** 下载进度 */
+    /** 銝蝸餈漲 */
     private val _progress = MutableStateFlow(0f)
     val progress: StateFlow<Float> = _progress.asStateFlow()
     
-    /** 离线地图目录 */
+    /** 蝳餌瑪�啣�桀� */
     private val offlineDir: File by lazy {
         File(context.filesDir, "offline_maps").apply {
             if (!exists()) mkdirs()
         }
     }
     
-    /** 最大存储空间（500MB�?*/
+    /** �憭批��函征�湛�500MB嚗?*/
     private val MAX_STORAGE_BYTES = 500L * 1024 * 1024
     
     /**
-     * 下载指定区域的地图瓦�?
-     * @param centerLat 中心纬度
-     * @param centerLng 中心经度
-     * @param zoom 缩放级别�?-18�?
-     * @param radiusKm 半径（公里），默�?10km
+     * 銝蝸���箏���曄�?
+     * @param centerLat 銝剖�蝥砍漲
+     * @param centerLng 銝剖�蝏漲
+     * @param zoom 蝻拇蝥批嚗?-18嚗?
+     * @param radiusKm ��嚗��嚗�霈?10km
      */
     suspend fun downloadArea(
         centerLat: Double,
@@ -66,16 +66,16 @@ class OfflineMapManager @Inject constructor(
     ): Result<Int> {
         return withContext(Dispatchers.IO) {
             try {
-                // 检查网络连�?
+                // 璉�亦�蝏��?
                 if (!isWifiConnected() && !isNetworkAvailable()) {
-                    _downloadState.value = DownloadState.ERROR("无网络连�?)
-                    return@withContext Result.failure(Exception("无网络连�?))
+                    _downloadState.value = DownloadState.ERROR("Done)
+                    return@withContext Result.failure(Exception("Done)
                 }
                 
                 _downloadState.value = DownloadState.DOWNLOADING
                 _progress.value = 0f
                 
-                // 计算需要下载的瓦片范围
+                // 霈∠��閬�頧賜��衣��
                 val tileRange = calculateTileRange(centerLat, centerLng, zoom, radiusKm)
                 
                 val totalTiles = (tileRange.endX - tileRange.startX + 1) * 
@@ -83,29 +83,29 @@ class OfflineMapManager @Inject constructor(
                 
                 var downloadedCount = 0
                 
-                // 批量下载瓦片
+                // �寥�銝蝸�衣�
                 for (x in tileRange.startX..tileRange.endX) {
                     for (y in tileRange.startY..tileRange.endY) {
                         if (_downloadState.value == DownloadState.CANCELLED) {
-                            return@withContext Result.failure(Exception("下载已取�?))
+                            return@withContext Result.failure(Exception("Done)
                         }
                         
                         try {
-                            // 检查是否已存在
+                            // 璉�交�血歇摮
                             val cachedTile = mapCacheManager.getTileFromCache(zoom, x, y)
                             if (cachedTile != null) {
                                 downloadedCount++
                                 continue
                             }
                             
-                            // 下载瓦片
+                            // 銝蝸�衣�
                             downloadTile(zoom, x, y)
                             downloadedCount++
                             
-                            // 更新进度
+                            // �湔餈漲
                             _progress.value = downloadedCount.toFloat() / totalTiles
                         } catch (e: Exception) {
-                            // 单个瓦片下载失败，继续下一�?
+                            // �葵�衣�銝蝸憭梯揖嚗誧蝏凋�銝銝?
                             e.printStackTrace()
                         }
                     }
@@ -116,21 +116,21 @@ class OfflineMapManager @Inject constructor(
                 
                 Result.success(downloadedCount)
             } catch (e: Exception) {
-                _downloadState.value = DownloadState.ERROR(e.message ?: "下载失败")
+                _downloadState.value = DownloadState.ERROR(e.message ?: "銝蝸憭梯揖")
                 Result.failure(e)
             }
         }
     }
     
     /**
-     * 取消下载
+     * ��銝蝸
      */
     fun cancelDownload() {
         _downloadState.value = DownloadState.CANCELLED
     }
     
     /**
-     * 检查是否为 WiFi 环境
+     * 璉�交�虫蛹 WiFi �臬�
      */
     fun isWifiConnected(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
@@ -139,7 +139,7 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 检查网络是否可�?
+     * 璉�亦�蝏�血�?
      */
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
@@ -148,7 +148,7 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 获取已下载的地图区域列表
+     * �瑕�撌脖�頧賜��啣�箏��”
      */
     fun getDownloadedAreas(): List<OfflineArea> {
         val areas = mutableListOf<OfflineArea>()
@@ -182,7 +182,7 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 清除离线地图
+     * 皜蝳餌瑪�啣
      */
     suspend fun clearOfflineMaps(): Result<Unit> {
         return withContext(Dispatchers.IO) {
@@ -197,23 +197,23 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 获取离线地图占用空间
+     * �瑕�蝳餌瑪�啣�蝛粹
      */
     fun getStorageUsed(): Long {
         return getFileSize(offlineDir)
     }
     
     /**
-     * 获取可用空间
+     * �瑕��舐蝛粹
      */
     fun getStorageAvailable(): Long {
         return MAX_STORAGE_BYTES - getStorageUsed()
     }
     
-    // ==================== 内部方法 ====================
+    // ==================== ��寞� ====================
     
     /**
-     * 计算瓦片范围
+     * 霈∠��衣��
      */
     private fun calculateTileRange(
         lat: Double,
@@ -221,12 +221,12 @@ class OfflineMapManager @Inject constructor(
         zoom: Int,
         radiusKm: Double
     ): TileRange {
-        // 将经纬度转换为瓦片坐�?
+        // 撠�蝥砍漲頧祆銝箇���?
         val centerTileX = lonToTileX(lng, zoom)
         val centerTileY = latToTileY(lat, zoom)
         
-        // 根据半径计算需要扩展的瓦片�?
-        // �?zoom 15 级别，每个瓦片约覆盖 1km²
+        // �寞��霈∠��閬撅��衣��?
+        // �?zoom 15 蝥批嚗�銝芰�漲閬� 1km簡
         val tileRadius = (radiusKm / 1.0).toInt().coerceAtLeast(1)
         
         return TileRange(
@@ -238,15 +238,15 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 下载单个瓦片
+     * 銝蝸�葵�衣�
      */
     private suspend fun downloadTile(zoom: Int, x: Int, y: Int) {
-        // 检查存储空�?
+        // 璉�亙��函征�?
         if (getStorageUsed() >= MAX_STORAGE_BYTES) {
-            throw Exception("存储空间不足")
+            throw Exception("摮蝛粹銝雲")
         }
         
-        // 高德地图瓦片 URL
+        // 擃噸�啣�衣� URL
         val url = "https://webrd0${(x + y) % 4 + 1}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x=$x&y=$y&z=$zoom"
         
         val connection = URL(url).openConnection() as HttpURLConnection
@@ -257,7 +257,7 @@ class OfflineMapManager @Inject constructor(
             val inputStream = connection.inputStream
             val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
             
-            // 保存到缓�?
+            // 靽��啁�摮?
             mapCacheManager.saveTileToCache(zoom, x, y, bitmap)
         } finally {
             connection.disconnect()
@@ -265,14 +265,14 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 经度转瓦�?X 坐标
+     * 蝏漲頧祉�?X ��
      */
     private fun lonToTileX(lon: Double, zoom: Int): Int {
         return ((lon + 180.0) / 360.0 * (1 shl zoom)).toInt()
     }
     
     /**
-     * 纬度转瓦�?Y 坐标
+     * 蝥砍漲頧祉�?Y ��
      */
     private fun latToTileY(lat: Double, zoom: Int): Int {
         val latRad = Math.toRadians(lat)
@@ -281,7 +281,7 @@ class OfflineMapManager @Inject constructor(
     }
     
     /**
-     * 递归计算文件夹大�?
+     * ��霈∠��辣憭孵之撠?
      */
     private fun getFileSize(file: File): Long {
         if (!file.exists()) return 0
@@ -297,10 +297,10 @@ class OfflineMapManager @Inject constructor(
     }
 }
 
-// ==================== 数据模型 ====================
+// ==================== �唳璅∪� ====================
 
 /**
- * 下载状�?
+ * 銝蝸�嗆?
  */
 sealed class DownloadState {
     object IDLE : DownloadState()
@@ -311,7 +311,7 @@ sealed class DownloadState {
 }
 
 /**
- * 瓦片范围
+ * �衣��
  */
 data class TileRange(
     val startX: Int,
@@ -321,7 +321,7 @@ data class TileRange(
 )
 
 /**
- * 离线区域
+ * 蝳餌瑪�箏�
  */
 data class OfflineArea(
     val zoom: Int,
