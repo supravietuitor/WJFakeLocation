@@ -5,6 +5,7 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import com.steadywj.wjfakelocation.data.model.FakeWifiInfo
+import com.steadywj.wjfakelocation.data.model.SecurityType
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
