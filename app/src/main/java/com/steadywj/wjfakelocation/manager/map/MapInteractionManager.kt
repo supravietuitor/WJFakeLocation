@@ -17,57 +17,57 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 地图交互管理�?
+ * �啣鈭支�蝞∠��?
  * 
- * 功能:
- * - 长按添加标记�?
- * - 拖拽微调位置
- * - 双击放大/缩小
- * - 手势识别
+ * �:
+ * - �踵�瘛餃��扇�?
+ * - �敺株�雿蔭
+ * - ��曉之/蝻拙�
+ * - �霂
  */
 @Singleton
 class MapInteractionManager @Inject constructor() {
     
-    /** 当前标记�?*/
+    /** 敶��扇�?*/
     private val _currentMarker = MutableStateFlow<Marker?>(null)
     val currentMarker: StateFlow<Marker?> = _currentMarker.asStateFlow()
     
-    /** 最后点击位�?*/
+    /** ���颱�蝵?*/
     private var lastTapPosition: LatLng? = null
     
-    /** 手势检测器 */
+    /** �璉瘚 */
     private var gestureDetector: GestureDetector? = null
     
-    /** 是否正在拖拽 */
+    /** �臬甇�� */
     private var isDragging = false
     
     /**
-     * 初始化手势检测器
+     * �����踵�瘚
      */
     fun initialize(context: Context, aMap: AMap) {
         gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             
             override fun onLongPress(e: MotionEvent) {
-                // 长按添加标记�?
+                // �踵�瘛餃��扇�?
                 val screenX = e.x
                 val screenY = e.y
                 
                 aMap.projection.fromScreenLocation(
                     android.graphics.Point(screenX.toInt(), screenY.toInt())
                 )?.let { latLng ->
-                    addMarkerAtLocation(aMap, latLng, "长按添加的位�?)
+                    addMarkerAtLocation(aMap, latLng, "Done)
                 }
             }
             
             override fun onDoubleTap(e: MotionEvent): Boolean {
-                // 双击放大
+                // ��曉之
                 val screenX = e.x
                 val screenY = e.y
                 
                 aMap.projection.fromScreenLocation(
                     android.graphics.Point(screenX.toInt(), screenY.toInt())
                 )?.let { latLng ->
-                    // 以点击位置为中心放大
+                    // 隞亦�颱�蝵桐蛹銝剖��曉之
                     aMap.animateMap(
                         com.amap.api.maps2d.CameraUpdateFactory.newLatLngZoom(
                             latLng,
@@ -79,7 +79,7 @@ class MapInteractionManager @Inject constructor() {
             }
             
             override fun onSingleTapUp(e: MotionEvent): Boolean {
-                // 单击选择标记�?
+                // ���扇�?
                 val screenX = e.x
                 val screenY = e.y
                 
@@ -88,10 +88,10 @@ class MapInteractionManager @Inject constructor() {
                 )?.let { latLng ->
                     lastTapPosition = latLng
                     
-                    // 检查是否点击到现有标记�?
+                    // 璉�交�衣�餃�唳��扇�?
                     _currentMarker.value?.let { marker ->
                         val distance = calculateDistance(latLng, marker.position)
-                        if (distance < 50) { // 50 米范围内
+                        if (distance < 50) { // 50 蝐唾��游�
                             selectMarker(marker)
                         }
                     }
@@ -100,7 +100,7 @@ class MapInteractionManager @Inject constructor() {
             }
         })
         
-        // 设置地图触摸监听
+        // 霈曄蔭�啣閫行�
         aMap.setOnMapTouchListener { event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -111,7 +111,7 @@ class MapInteractionManager @Inject constructor() {
                 }
                 MotionEvent.ACTION_UP -> {
                     if (!isDragging) {
-                        // 短距离移动视为点�?
+                        // �剛�蝳餌宏�刻�銝箇�?
                         gestureDetector?.onTouchEvent(event)
                     }
                     isDragging = false
@@ -119,30 +119,30 @@ class MapInteractionManager @Inject constructor() {
             }
         }
         
-        // 设置标记点拖动监�?
+        // 霈曄蔭�扇�寞��函��?
         aMap.setOnMarkerDragListener(object : AMap.OnMarkerDragListener {
             override fun onMarkerStartDrag(marker: Marker) {
-                // 开始拖�?
+                // 撘憪��?
                 selectMarker(marker)
             }
             
             override fun onMarkerDrag(marker: Marker) {
-                // 拖拽�?- 实时更新位置
+                // �銝?- 摰�湔雿蔭
                 updateMarkerPosition(marker)
             }
             
             override fun onMarkerEndDrag(marker: Marker) {
-                // 拖拽结束 - 保存最终位�?
+                // �蝏� - 靽��蝏�蝵?
                 finalizeMarkerPosition(marker)
             }
         })
     }
     
     /**
-     * 在指定位置添加标记点
+     * �冽�摰�蝵格溶��霈啁
      */
-    fun addMarkerAtLocation(aMap: AMap, latLng: LatLng, title: String = "目标位置"): Marker? {
-        // 移除旧标记点
+    fun addMarkerAtLocation(aMap: AMap, latLng: LatLng, title: String = "�格�雿蔭"): Marker? {
+        // 蝘駁�扳�霈啁
         _currentMarker.value?.remove()
         
         try {
@@ -150,13 +150,13 @@ class MapInteractionManager @Inject constructor() {
                 .position(latLng)
                 .title(title)
                 .snippet("${latLng.latitude}, ${latLng.longitude}")
-                .draggable(true) // 可拖�?
+                .draggable(true) // �舀��?
                 .icon(com.amap.api.maps2d.model.BitmapDescriptorFactory.defaultMarker())
             
             val marker = aMap.addMarker(markerOptions)
             _currentMarker.value = marker
             
-            // 移动到标记点位置
+            // 蝘餃�唳�霈啁雿蔭
             aMap.animateMap(
                 com.amap.api.maps2d.CameraUpdateFactory.newLatLng(latLng)
             )
@@ -168,7 +168,7 @@ class MapInteractionManager @Inject constructor() {
     }
     
     /**
-     * 选择标记�?
+     * ��扇�?
      */
     fun selectMarker(marker: Marker) {
         _currentMarker.value = marker
@@ -176,25 +176,25 @@ class MapInteractionManager @Inject constructor() {
     }
     
     /**
-     * 更新标记点位置（拖拽中）
+     * �湔�扇�嫣�蝵殷��銝哨�
      */
     fun updateMarkerPosition(marker: Marker) {
-        // 可以在这里实时更�?UI 或显示坐标信�?
+        // �臭誑�刻����嗆�?UI �蝷箏��縑�?
     }
     
     /**
-     * 确认标记点最终位置（拖拽结束�?
+     * 蝖株恕�扇�寞�蝏�蝵殷��蝏�嚗?
      */
     fun finalizeMarkerPosition(marker: Marker) {
         val position = marker.position
         marker.snippet = "${position.latitude}, ${position.longitude}"
         
-        // 通知 ViewModel 更新选中的位�?
-        // 通过回调�?Flow 实现
+        // � ViewModel �湔�葉��蝵?
+        // �����?Flow 摰
     }
     
     /**
-     * 清除所有标记点
+     * 皜���霈啁
      */
     fun clearMarkers() {
         _currentMarker.value?.remove()
@@ -202,10 +202,10 @@ class MapInteractionManager @Inject constructor() {
     }
     
     /**
-     * 计算两点间距离（米）
+     * 霈∠�銝斤�渲�蝳鳴�蝐喉�
      */
     private fun calculateDistance(from: LatLng, to: LatLng): Double {
-        val earthRadius = 6371000.0 // �?
+        val earthRadius = 6371000.0 // 蝐?
         val dLat = Math.toRadians(to.latitude - from.latitude)
         val dLon = Math.toRadians(to.longitude - from.longitude)
         
@@ -219,7 +219,7 @@ class MapInteractionManager @Inject constructor() {
     }
     
     /**
-     * 释放资源
+     * �韏�
      */
     fun destroy() {
         clearMarkers()
@@ -228,7 +228,7 @@ class MapInteractionManager @Inject constructor() {
 }
 
 /**
- * Compose 扩展：地图交互修饰符
+ * Compose �拙�嚗�曆漱鈭耨擖啁泵
  */
 @Composable
 fun rememberMapInteraction(
