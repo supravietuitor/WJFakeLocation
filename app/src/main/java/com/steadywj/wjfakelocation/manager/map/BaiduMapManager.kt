@@ -148,7 +148,7 @@ class BaiduMapManager @Inject constructor(
                                 trySend(Result.failure(Exception("æ— æ³•è§£æžåœ°å€")))
                             }
                         } else {
-                            trySend(Result.failure(Exception("Done)
+                            trySend(Result.failure(Exception("Done")
                         }
                     } catch (e: Exception) {
                         trySend(Result.failure(e))
