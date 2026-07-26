@@ -11,10 +11,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.amap.api.maps2d.AMap
-import com.amap.api.maps2d.model.BitmapDescriptorFactory
-import com.amap.api.maps2d.model.Marker
-import com.amap.api.maps2d.model.MarkerOptions
+import com.amap.api.maps.AMap
+import com.amap.api.maps.model.BitmapDescriptorFactory
+import com.amap.api.maps.model.Marker
+import com.amap.api.maps.model.MarkerOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,87 +22,87 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 罗盘方向指示�?
+ * ç½—ç›˜æ–¹å‘æŒ‡ç¤ºå™?
  * 
- * 功能:
- * - 实时获取设备朝向
- * - 在地图上显示方向箭头
- * - 自动旋转更新
+ * åŠŸèƒ½:
+ * - å®žæ—¶èŽ·å–è®¾å¤‡æœå‘
+ * - åœ¨åœ°å›¾ä¸Šæ˜¾ç¤ºæ–¹å‘ç®­å¤´
+ * - è‡ªåŠ¨æ—‹è½¬æ›´æ–°
  */
 @Singleton
 class CompassOverlay @Inject constructor() : SensorEventListener {
     
-    /** 当前朝向角度�?-360 度，正北�?0�?*/
+    /** å½“å‰æœå‘è§’åº¦ï¼?-360 åº¦ï¼Œæ­£åŒ—ä¸?0ï¼?*/
     private val _heading = MutableStateFlow(0f)
     val heading: StateFlow<Float> = _heading.asStateFlow()
     
-    /** 传感器管理器 */
+    /** ä¼ æ„Ÿå™¨ç®¡ç†å™¨ */
     private var sensorManager: SensorManager? = null
     
-    /** 方向标记�?*/
+    /** æ–¹å‘æ ‡è®°ç‚?*/
     private var compassMarker: Marker? = null
     
-    /** 地图实例 */
+    /** åœ°å›¾å®žä¾‹ */
     private var aMap: AMap? = null
     
-    /** 是否启用罗盘 */
+    /** æ˜¯å¦å¯ç”¨ç½—ç›˜ */
     private var isEnabled = false
     
     /**
-     * 初始化罗�?
-     * @param context 上下�?
-     * @param map 地图实例
+     * åˆå§‹åŒ–ç½—ç›?
+     * @param context ä¸Šä¸‹æ–?
+     * @param map åœ°å›¾å®žä¾‹
      */
     fun initialize(context: Context, map: AMap) {
         aMap = map
         
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         
-        // 添加方向箭头标记点（默认指向正北�?
+        // æ·»åŠ æ–¹å‘ç®­å¤´æ ‡è®°ç‚¹ï¼ˆé»˜è®¤æŒ‡å‘æ­£åŒ—ï¼?
         addCompassMarker()
         
         enable()
     }
     
     /**
-     * 添加方向箭头标记�?
+     * æ·»åŠ æ–¹å‘ç®­å¤´æ ‡è®°ç‚?
      */
     private fun addCompassMarker() {
         if (aMap == null) return
         
         try {
-            // 使用高德地图内置的方向图�?
+            // ä½¿ç”¨é«˜å¾·åœ°å›¾å†…ç½®çš„æ–¹å‘å›¾æ ?
             val markerOptions = MarkerOptions()
                 .position(aMap!!.cameraPosition.target)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .anchor(0.5f, 0.5f) // 中心对齐
+                .anchor(0.5f, 0.5f) // ä¸­å¿ƒå¯¹é½
                 .draggable(false)
                 .visible(true)
             
             compassMarker = aMap!!.addMarker(markerOptions)
         } catch (e: Exception) {
-            // 忽略添加失败
+            // å¿½ç•¥æ·»åŠ å¤±è´¥
         }
     }
     
     /**
-     * 启用罗盘
+     * å¯ç”¨ç½—ç›˜
      */
     fun enable() {
         if (isEnabled) return
         
         isEnabled = true
         
-        // 注册方向传感�?
+        // æ³¨å†Œæ–¹å‘ä¼ æ„Ÿå™?
         sensorManager?.registerListener(
             this,
             sensorManager?.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-            SensorManager.SENSOR_DELAY_UI // UI 刷新频率
+            SensorManager.SENSOR_DELAY_UI // UI åˆ·æ–°é¢‘çŽ‡
         )
     }
     
     /**
-     * 禁用罗盘
+     * ç¦ç”¨ç½—ç›˜
      */
     fun disable() {
         if (!isEnabled) return
@@ -112,17 +112,17 @@ class CompassOverlay @Inject constructor() : SensorEventListener {
     }
     
     /**
-     * 更新箭头方向
+     * æ›´æ–°ç®­å¤´æ–¹å‘
      */
     private fun updateCompassRotation(heading: Float) {
         compassMarker?.let { marker ->
-            // 平滑旋转到目标角�?
+            // å¹³æ»‘æ—‹è½¬åˆ°ç›®æ ‡è§’åº?
             marker.rotation = heading
         }
     }
     
     /**
-     * 释放资源
+     * é‡Šæ”¾èµ„æº
      */
     fun destroy() {
         disable()
@@ -137,9 +137,9 @@ class CompassOverlay @Inject constructor() : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type != Sensor.TYPE_ORIENTATION) return
         
-        val azimuth = event.values[0] // 方位角（0-360 度）
+        val azimuth = event.values[0] // æ–¹ä½è§’ï¼ˆ0-360 åº¦ï¼‰
         
-        // 过滤抖动
+        // è¿‡æ»¤æŠ–åŠ¨
         if (kotlin.math.abs(azimuth - _heading.value) > 2.0f) {
             _heading.value = azimuth
             updateCompassRotation(azimuth)
@@ -147,12 +147,12 @@ class CompassOverlay @Inject constructor() : SensorEventListener {
     }
     
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // 精度变化时的回调（可选处理）
+        // ç²¾åº¦å˜åŒ–æ—¶çš„å›žè°ƒï¼ˆå¯é€‰å¤„ç†ï¼‰
     }
 }
 
 /**
- * Compose 扩展：记住罗盘组�?
+ * Compose æ‰©å±•ï¼šè®°ä½ç½—ç›˜ç»„ä»?
  */
 @Composable
 fun rememberCompassOverlay(map: AMap?): CompassOverlay {
@@ -170,7 +170,7 @@ fun rememberCompassOverlay(map: AMap?): CompassOverlay {
         }
     }
     
-    // 监听生命周期
+    // ç›‘å¬ç”Ÿå‘½å‘¨æœŸ
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
