@@ -11,31 +11,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.amap.api.maps2d.AMap
-import com.amap.api.maps2d.CameraUpdateFactory
-import com.amap.api.maps2d.MapView
-import com.amap.api.maps2d.model.LatLng
-import com.amap.api.maps2d.model.MarkerOptions
+import com.amap.api.maps.AMap
+import com.amap.api.maps.CameraUpdateFactory
+import com.amap.api.maps.MapView
+import com.amap.api.maps.model.LatLng
+import com.amap.api.maps.model.MarkerOptions
 
 /**
- * 高德地图 MapView 包装组件（优化版�?
+ * é«˜å¾·åœ°å›¾ MapView åŒ…è£…ç»„ä»¶ï¼ˆä¼˜åŒ–ç‰ˆï¼?
  * 
- * 特�?
- * - 预加载缓�?
- * - 加载进度指示�?
- * - 生命周期自动管理
+ * ç‰¹æ€?
+ * - é¢„åŠ è½½ç¼“å­?
+ * - åŠ è½½è¿›åº¦æŒ‡ç¤ºå™?
+ * - ç”Ÿå‘½å‘¨æœŸè‡ªåŠ¨ç®¡ç†
  * 
- * @param modifier Compose 修饰�?
- * @param onMapReady 地图准备就绪回调
- * @param initialLatitude 初始纬度
- * @param initialLongitude 初始经度
- * @param zoomLevel 缩放级别（默�?15�?
+ * @param modifier Compose ä¿®é¥°ç¬?
+ * @param onMapReady åœ°å›¾å‡†å¤‡å°±ç»ªå›žè°ƒ
+ * @param initialLatitude åˆå§‹çº¬åº¦
+ * @param initialLongitude åˆå§‹ç»åº¦
+ * @param zoomLevel ç¼©æ”¾çº§åˆ«ï¼ˆé»˜è®?15ï¼?
  */
 @Composable
 fun AMapView(
     modifier: Modifier = Modifier,
     onMapReady: ((AMap) -> Unit)? = null,
-    initialLatitude: Double = 39.908823, // 北京
+    initialLatitude: Double = 39.908823, // åŒ—äº¬
     initialLongitude: Double = 116.397470,
     zoomLevel: Float = 15f
 ) {
@@ -50,32 +50,32 @@ fun AMapView(
                 MapView(ctx).apply {
                     mapView = this
                     
-                    // 获取 AMap 实例
+                    // èŽ·å– AMap å®žä¾‹
                     getMapAsync { map ->
                         aMap = map
                         
-                        // 设置初始位置和缩放级�?
+                        // è®¾ç½®åˆå§‹ä½ç½®å’Œç¼©æ”¾çº§åˆ?
                         val latLng = LatLng(initialLatitude, initialLongitude)
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
                         
-                        // 启用定位图层（需要权限）
+                        // å¯ç”¨å®šä½å›¾å±‚ï¼ˆéœ€è¦æƒé™ï¼‰
                         map.isMyLocationEnabled = true
                         
-                        // 标记为已加载
+                        // æ ‡è®°ä¸ºå·²åŠ è½½
                         isMapLoaded = true
                         
-                        // 通知地图已准备好
+                        // é€šçŸ¥åœ°å›¾å·²å‡†å¤‡å¥½
                         onMapReady?.invoke(map)
                     }
                 }
             },
             modifier = Modifier.fillMaxSize(),
             update = { view ->
-                // 可以在这里更新地图配�?
+                // å¯ä»¥åœ¨è¿™é‡Œæ›´æ–°åœ°å›¾é…ç½?
             }
         )
         
-        // 显示加载进度指示�?
+        // æ˜¾ç¤ºåŠ è½½è¿›åº¦æŒ‡ç¤ºå™?
         if (!isMapLoaded) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -86,14 +86,14 @@ fun AMapView(
 }
 
 /**
- * 在地图上添加标记�?
+ * åœ¨åœ°å›¾ä¸Šæ·»åŠ æ ‡è®°ç‚?
  * 
- * @param latitude 纬度
- * @param longitude 经度
- * @param title 标题
- * @param snippet 描述信息
- * @param draggable 是否可拖拽（默认 true�?
- * @param onClick 点击回调
+ * @param latitude çº¬åº¦
+ * @param longitude ç»åº¦
+ * @param title æ ‡é¢˜
+ * @param snippet æè¿°ä¿¡æ¯
+ * @param draggable æ˜¯å¦å¯æ‹–æ‹½ï¼ˆé»˜è®¤ trueï¼?
+ * @param onClick ç‚¹å‡»å›žè°ƒ
  */
 @Composable
 fun MapMarker(
@@ -106,7 +106,7 @@ fun MapMarker(
     map: AMap?
 ) {
     DisposableEffect(latitude, longitude, title, snippet, map) {
-        var marker: com.amap.api.maps2d.model.Marker? = null
+        var marker: com.amap.api.maps.model.Marker? = null
         
         if (map != null) {
             val markerOptions = MarkerOptions()
@@ -117,7 +117,7 @@ fun MapMarker(
             
             marker = map.addMarker(markerOptions)
             
-            // 设置点击监听�?
+            // è®¾ç½®ç‚¹å‡»ç›‘å¬å™?
             if (onClick != null) {
                 map.setOnMarkerClickListener { clickedMarker ->
                     if (clickedMarker == marker) {
@@ -131,15 +131,15 @@ fun MapMarker(
         }
         
         onDispose {
-            // 清理标记�?
+            // æ¸…ç†æ ‡è®°ç‚?
             marker?.remove()
         }
     }
 }
 
 /**
- * 高德地图生命周期管理
- * 需要在 Composable 中调用以正确处理生命周期
+ * é«˜å¾·åœ°å›¾ç”Ÿå‘½å‘¨æœŸç®¡ç†
+ * éœ€è¦åœ¨ Composable ä¸­è°ƒç”¨ä»¥æ­£ç¡®å¤„ç†ç”Ÿå‘½å‘¨æœŸ
  */
 @Composable
 fun AMapLifecycleHandler(mapView: MapView?) {
