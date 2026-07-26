@@ -2,10 +2,10 @@
 package com.steadywj.wjfakelocation.manager.map.utils
 
 import android.content.Context
-import com.amap.api.maps2d.AMap
-import com.amap.api.maps2d.model.Tile
-import com.amap.api.maps2d.model.TileProvider
-import com.amap.api.maps2d.model.UrlTileProvider
+import com.amap.api.maps.AMap
+import com.amap.api.maps.model.Tile
+import com.amap.api.maps.model.TileProvider
+import com.amap.api.maps.model.UrlTileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
