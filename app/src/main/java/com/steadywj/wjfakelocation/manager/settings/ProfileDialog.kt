@@ -20,7 +20,7 @@ fun ProfileDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("�璅∪�蝞∠�")
+            Text("Profile Management")
         },
         text = {
             Column(
@@ -29,8 +29,8 @@ fun ProfileDialog(
                 OutlinedTextField(
                     value = profileName,
                     onValueChange = { profileName = it },
-                    label = { Text("璅∪��妍") },
-                    placeholder = { Text("靘�嚗振��詻郎�?) },
+                    label = { Text("Profile Name") },
+                    placeholder = { Text("Enter profile name") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 
@@ -40,7 +40,7 @@ fun ProfileDialog(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "憸挽璅∪�嚗?,
+                        text = "Profile List",
                         style = MaterialTheme.typography.labelLarge
                     )
                     
@@ -49,18 +49,18 @@ fun ProfileDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         FilterChip(
-                            onClick = { /* �蝸摰嗅滬璅∪� */ },
-                            label = { Text("摰?) },
+                            onClick = { },
+                            label = { Text("Default") },
                             selected = false
                         )
                         FilterChip(
-                            onClick = { /* �蝸撌乩�璅∪� */ },
-                            label = { Text("�砍") },
+                            onClick = { },
+                            label = { Text("Custom") },
                             selected = false
                         )
                         FilterChip(
-                            onClick = { /* �蝸摮行璅∪� */ },
-                            label = { Text("摮行") },
+                            onClick = { },
+                            label = { Text("Recent") },
                             selected = false
                         )
                     }
@@ -68,7 +68,7 @@ fun ProfileDialog(
             }
             
             Text(
-                text = "�內嚗�摮芋撘�摮敶�����雿挽蝵殷�蝎曉漲�絲�漲蝑�",
+                text = "Saved profiles will appear here. You can save and load different location configurations.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -90,7 +90,7 @@ fun ProfileDialog(
                     },
                     enabled = profileName.isNotBlank()
                 ) {
-                    Text("�蝸")
+                    Text("Load")
                 }
                 
                 Button(
@@ -101,7 +101,7 @@ fun ProfileDialog(
                     },
                     enabled = profileName.isNotBlank()
                 ) {
-                    Text("靽�")
+                    Text("Save")
                 }
             }
         }
