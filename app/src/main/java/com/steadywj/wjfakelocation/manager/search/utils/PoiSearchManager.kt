@@ -161,11 +161,11 @@ data class PoiResult(
  * POI ç±»åž‹æžšä¸¾ï¼ˆé«˜å¾·åœ°å›?POI ç¼–ç ï¼?
  */
 enum class PoiType(val code: String, val displayName: String) {
-    FOOD("é¤é¥®æœåŠ¡", "ç¾Žé£Ÿ"),
-    HOTEL("ä½å®¿æœåŠ¡", "é…’åº—"),
-    SHOPPING("è´­ç‰©æœåŠ¡", "è´­ç‰©"),
+    FOOD("food", "Food"),
+    HOTEL("hotel", "Hotel"),
+    SHOPPING("shopping", "Shopping"),
     TRANSPORT("äº¤é€šè®¾æ–?, "äº¤é€?),
-    ENTERTAINMENT("ä¼‘é—²å¨±ä¹", "å¨±ä¹"),
+    ENTERTAINMENT("entertainment", "Entertainment"),
     EDUCATION("Education", "Education"),
     MEDICAL("Medical", "Medical"),
     FINANCE("Finance", "Finance"),
