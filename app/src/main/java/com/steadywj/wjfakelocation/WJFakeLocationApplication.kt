@@ -37,7 +37,7 @@ class WJFakeLocationApplication : Application() {
     private fun initAMapSDK() {
         try {
             // 初始化地图服务设置
-            ServiceSettings.getInstance()
+            ServiceSettings.getInstance(this@WJFakeLocationApplication)
             
             WJLogger.d("高德地图 SDK 初始化成功")
         } catch (e: Exception) {
