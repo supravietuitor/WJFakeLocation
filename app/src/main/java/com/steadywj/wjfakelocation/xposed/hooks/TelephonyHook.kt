@@ -40,11 +40,11 @@ class TelephonyHook : IXposedHookLoadPackage {
             val clazz = XposedHelpers.findClass(TelephonyManager::class.java.name, lpparam.classLoader)
             
             XposedBridge.hookAllMethods(clazz, "getAllCellInfo", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     // 检查是否启用基站伪造
                     if (!isFakeCellEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     try {
@@ -53,7 +53,7 @@ class TelephonyHook : IXposedHookLoadPackage {
                         return fakeCells
                     } catch (e: Exception) {
                         XposedBridge.log("[TelephonyHook] 创建假基站失败：${e.message}")
-                        return invokeOriginalMethod(param)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                 }
             })
@@ -70,10 +70,10 @@ class TelephonyHook : IXposedHookLoadPackage {
             val clazz = XposedHelpers.findClass(TelephonyManager::class.java.name, lpparam.classLoader)
             
             XposedBridge.hookAllMethods(clazz, "getCellLocation", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeCellEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     try {
@@ -82,7 +82,7 @@ class TelephonyHook : IXposedHookLoadPackage {
                         return fakeLocation
                     } catch (e: Exception) {
                         XposedBridge.log("[TelephonyHook] 创建假服务小区失败：${e.message}")
-                        return invokeOriginalMethod(param)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                 }
             })
@@ -103,10 +103,10 @@ class TelephonyHook : IXposedHookLoadPackage {
             
             // Hook getLevel() - 信号级别
             XposedBridge.hookAllMethods(signalStrengthClass, "getLevel", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeCellEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     // 返回满格信号（4 格）
@@ -143,10 +143,10 @@ class TelephonyHook : IXposedHookLoadPackage {
         methodsToHook.forEach { methodName ->
             try {
                 XposedBridge.hookAllMethods(clazz, methodName, object : XC_MethodReplacement() {
-                    @Throws(Throwable::class.java)
+                    @Throws(Throwable::class)
                     override fun replaceHookedMethod(param: MethodHookParam): Any? {
                         if (!isFakeCellEnabled()) {
-                            return invokeOriginalMethod(param)
+                            return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                         }
                         
                         // 返回良好的信号值
@@ -171,8 +171,8 @@ class TelephonyHook : IXposedHookLoadPackage {
     /**
      * 创建假基站列表
      */
-    private fun createFakeCellInfoList(): List<CellInfo> {
-        val fakeCells = mutableListOf<CellInfo>()
+    private fun createFakeCellInfoList(): List<Any> {
+        val fakeCells = mutableListOf<Any>()
         
         // 从配置读取假基站信息
         val fakeCellInfos = FakeCellInfo.getFakeCells()
@@ -204,7 +204,7 @@ class TelephonyHook : IXposedHookLoadPackage {
         
         return when (fakeInfo.type) {
             CellType.GSM -> createGsmCellLocation(fakeInfo)
-            CellType.CDMA -> createCdmaCellLocation(fakeInfo)
+            CellType.CDMA -> createGsmCellLocation(fakeInfo)
             CellType.LTE -> createLteCellLocation(fakeInfo)
             CellType.WCDMA -> createGsmCellLocation(fakeInfo)
             CellType.TDSCDMA -> createGsmCellLocation(fakeInfo)
@@ -329,16 +329,7 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createLteCellLocation(fakeInfo: FakeCellInfo): Any {
-        // API 33+ 使用 CellLocation.createCdma(...)
-        val cellLocationClass = XposedHelpers.findClass("android.telephony.CellLocation", null)
-        return XposedHelpers.callStaticMethod(
-            cellLocationClass,
-            "createCdma",
-            fakeInfo.basestationId ?: 0,
-            fakeInfo.longitude ?: 0.0,
-            fakeInfo.latitude ?: 0.0,
-            0 // alphaRange
-        )
+        return createGsmCellLocation(fakeInfo)
     }
     
     // ... 其他类型类似
