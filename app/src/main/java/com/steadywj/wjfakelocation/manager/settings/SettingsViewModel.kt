@@ -24,7 +24,7 @@ class SettingsViewModel @Inject constructor(
     /** 当前设置（响应式数据流） */
     val settings: StateFlow<LocationSettings> = preferencesRepository.settings
 
-    /** UI 状�?*/
+    /** UI 状�?*/
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
@@ -65,7 +65,7 @@ class SettingsViewModel @Inject constructor(
     /**
      * 更新随机偏移设置
      * @param enabled 是否启用
-     * @param radius 偏移半径（米�?
+     * @param radius 偏移半径（米�?
      */
     fun updateRandomize(enabled: Boolean, radius: Double) {
         viewModelScope.launch {
@@ -82,7 +82,7 @@ class SettingsViewModel @Inject constructor(
     /**
      * 更新速度设置
      * @param enabled 是否启用
-     * @param value 速度值（�?秒）
+     * @param value 速度值（�?秒）
      */
     fun updateSpeed(enabled: Boolean, value: Float) {
         viewModelScope.launch {
@@ -103,7 +103,7 @@ class SettingsViewModel @Inject constructor(
     fun saveApiKey(apiKey: String) {
         viewModelScope.launch {
             preferencesRepository.saveApiKey(apiKey)
-            _uiState.value = _uiState.value.copy(showSuccessMessage = "API Key 已保�?)
+            _uiState.value = _uiState.value.copy(showSuccessMessage = "API Key 已保�?)
         }
     }
 
@@ -113,7 +113,7 @@ class SettingsViewModel @Inject constructor(
     fun clearApiKey() {
         viewModelScope.launch {
             preferencesRepository.clearApiKey()
-            _uiState.value = _uiState.value.copy(showSuccessMessage = "API Key 已清�?)
+            _uiState.value = _uiState.value.copy(showSuccessMessage = "API Key 已清�?)
         }
     }
 
@@ -153,10 +153,10 @@ class SettingsViewModel @Inject constructor(
 }
 
 /**
- * 设置 UI 状�?
+ * 设置 UI 状�?
  * @property showSuccessMessage 成功消息
- * @property showApiKeyDialog 显示 API Key 对话�?
- * @property showProfileDialog 显示情景模式对话�?
+ * @property showApiKeyDialog 显示 API Key 对话�?
+ * @property showProfileDialog 显示情景模式对话�?
  */
 data class SettingsUiState(
     val showSuccessMessage: String? = null,
