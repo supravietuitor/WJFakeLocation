@@ -2,56 +2,33 @@
 package com.steadywj.wjfakelocation.manager.map.utils
 
 import android.content.Context
+import com.baidu.mapapi.search.geocode.GeoCodeOption
 import com.baidu.mapapi.search.geocode.GeoCodeResult
 import com.baidu.mapapi.search.geocode.GeoCoder
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * ç™¾åº¦åœ°å›¾ç®¡ç†å™?
- * 
- * åŠŸèƒ½:
- * - BD-09 â†?WGS-84 åæ ‡è½¬æ¢
- * - åœ°ç†ç¼–ç æœç´¢
- * - é€†åœ°ç†ç¼–ç ?
- */
 @Singleton
 class BaiduMapManager @Inject constructor(
     private val context: Context
 ) {
     
-    /**
-     * BD-09 è½?WGS-84
-     * ç™¾åº¦åæ ‡ç³?â†?ç«æ˜Ÿåæ ‡ç³?â†?GPS åæ ‡ç³?
-     */
     fun bd09ToWgs84(bdLat: Double, bdLng: Double): Pair<Double, Double> {
-        // BD-09 â†?GCJ-02
         val (gcjLat, gcjLng) = bd09ToGcj02(bdLat, bdLng)
-        
-        // GCJ-02 â†?WGS-84
         return gcj02ToWgs84(gcjLat, gcjLng)
     }
     
-    /**
-     * WGS-84 è½?BD-09
-     * GPS åæ ‡ç³?â†?ç«æ˜Ÿåæ ‡ç³?â†?ç™¾åº¦åæ ‡ç³?
-     */
     fun wgs84ToBd09(wgsLat: Double, wgsLng: Double): Pair<Double, Double> {
-        // WGS-84 â†?GCJ-02
         val (gcjLat, gcjLng) = wgs84ToGcj02(wgsLat, wgsLng)
-        
-        // GCJ-02 â†?BD-09
         return gcj02ToBd09(gcjLat, gcjLng)
     }
     
-    /**
-     * BD-09 è½?GCJ-02
-     */
     private fun bd09ToGcj02(bdLat: Double, bdLng: Double): Pair<Double, Double> {
         val xPi = Math.PI * 3000.0 / 180.0
         val x = bdLng - 0.0065
@@ -65,9 +42,6 @@ class BaiduMapManager @Inject constructor(
         return gcjLat to gcjLng
     }
     
-    /**
-     * GCJ-02 è½?BD-09
-     */
     private fun gcj02ToBd09(gcjLat: Double, gcjLng: Double): Pair<Double, Double> {
         val xPi = Math.PI * 3000.0 / 180.0
         val z = Math.sqrt(gcjLng * gcjLng + gcjLat * gcjLat) + 0.00002 * Math.sin(gcjLat * xPi)
@@ -79,23 +53,75 @@ class BaiduMapManager @Inject constructor(
         return bdLat to bdLng
     }
     
-    /**
-     * GCJ-02 è½?WGS-84
-     */
     private fun gcj02ToWgs84(gcjLat: Double, gcjLng: Double): Pair<Double, Double> {
-        return com.steadywj.wjfakelocation.xposed.common.LocationUtil.gcj02ToWgs84(gcjLat, gcjLng)
+        val ee = 0.00669342162296594323
+        val a = 6378245.0
+        
+        val dLat = transformLat(gcjLng - 105.0, gcjLat - 35.0)
+        val dLng = transformLng(gcjLng - 105.0, gcjLat - 35.0)
+        
+        val radLat = gcjLat / 180.0 * Math.PI
+        var magic = Math.sin(radLat)
+        magic = 1 - ee * magic * magic
+        
+        val sqrtMagic = Math.sqrt(magic)
+        
+        var wgsLat = gcjLat - dLat
+        var wgsLng = gcjLng - dLng
+        
+        wgsLat = wgsLat * 180.0 / Math.PI
+        wgsLng = wgsLng * 180.0 / Math.PI
+        
+        wgsLat = (2 * wgsLat - gcjLat)
+        wgsLng = (2 * wgsLng - gcjLng)
+        
+        wgsLat -= (dLat / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH)
+        wgsLng -= (dLng / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH * Math.cos(radLat))
+        
+        return Pair(wgsLat, wgsLng)
     }
     
-    /**
-     * WGS-84 è½?GCJ-02
-     */
     private fun wgs84ToGcj02(wgsLat: Double, wgsLng: Double): Pair<Double, Double> {
-        return com.steadywj.wjfakelocation.xposed.common.LocationUtil.wgs84ToGcj02(wgsLat, wgsLng)
+        val ee = 0.00669342162296594323
+        val a = 6378245.0
+        
+        val dLat = transformLat(wgsLng - 105.0, wgsLat - 35.0)
+        val dLng = transformLng(wgsLng - 105.0, wgsLat - 35.0)
+        
+        val radLat = wgsLat / 180.0 * Math.PI
+        var magic = Math.sin(radLat)
+        magic = 1 - ee * magic * magic
+        
+        val sqrtMagic = Math.sqrt(magic)
+        
+        var gcjLat = wgsLat + dLat
+        var gcjLng = wgsLng + dLng
+        
+        gcjLat = gcjLat * 180.0 / Math.PI
+        gcjLng = gcjLng * 180.0 / Math.PI
+        
+        gcjLat += (dLat / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH)
+        gcjLng += (dLng / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH * Math.cos(radLat))
+        
+        return Pair(gcjLat, gcjLng)
     }
     
-    /**
-     * åœ°ç†ç¼–ç æœç´¢ï¼ˆåœ°å€è½¬åæ ‡ï¼‰
-     */
+    private fun transformLat(lng: Double, lat: Double): Double {
+        var ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng))
+        ret += (20.0 * Math.sin(6.0 * lng * Math.PI) + 20.0 * Math.sin(2.0 * lng * Math.PI)) * 2.0 / 3.0
+        ret += (20.0 * Math.sin(lat * Math.PI) + 40.0 * Math.sin(lat / 3.0 * Math.PI)) * 2.0 / 3.0
+        ret += (160.0 * Math.sin(lat / 12.0 * Math.PI) + 320 * Math.sin(lat * Math.PI / 30.0)) * 2.0 / 3.0
+        return ret
+    }
+    
+    private fun transformLng(lng: Double, lat: Double): Double {
+        var ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng))
+        ret += (20.0 * Math.sin(6.0 * lng * Math.PI) + 20.0 * Math.sin(2.0 * lng * Math.PI)) * 2.0 / 3.0
+        ret += (20.0 * Math.sin(lng * Math.PI) + 40.0 * Math.sin(lng / 3.0 * Math.PI)) * 2.0 / 3.0
+        ret += (150.0 * Math.sin(lng / 12.0 * Math.PI) + 300.0 * Math.sin(lng / 30.0 * Math.PI)) * 2.0 / 3.0
+        return ret
+    }
+    
     fun geocodeAddress(address: String): Flow<Result<Pair<Double, Double>>> = callbackFlow {
         try {
             val geoCoder = GeoCoder.newInstance()
@@ -106,18 +132,16 @@ class BaiduMapManager @Inject constructor(
                         val latLng = result.location
                         trySend(Result.success(latLng.latitude to latLng.longitude))
                     } else {
-                        trySend(Result.failure(Exception("åœ°ç†ç¼–ç å¤±è´¥")))
+                        trySend(Result.failure(Exception("Geocode failed")))
                     }
                     close()
                 }
                 
-                override fun onGetReverseGeoCodeResult(result: Any?) {
-                    // ä¸ä½¿ç”¨é€†åœ°ç†ç¼–ç ?
+                override fun onGetReverseGeoCodeResult(result: ReverseGeoCodeResult?) {
                 }
             })
             
-            // æ‰§è¡Œåœ°ç†ç¼–ç 
-            geoCoder.geoCodeLocation(address, "å…¨å›½")
+            geoCoder.geoCode(GeoCodeOption().address(address).city(""))
         } catch (e: Exception) {
             trySend(Result.failure(e))
             close()
@@ -126,29 +150,22 @@ class BaiduMapManager @Inject constructor(
         awaitClose {}
     }
     
-    /**
-     * é€†åœ°ç†ç¼–ç ï¼ˆåæ ‡è½¬åœ°å€ï¼?
-     */
     fun reverseGeocode(latitude: Double, longitude: Double): Flow<Result<String>> = callbackFlow {
         try {
             val geoCoder = GeoCoder.newInstance()
             
             geoCoder.setOnGetReverseGeoCodeResultListener(object : OnGetGeoCoderResultListener {
-                override fun onGetReverseGeoCodeResult(result: Any?) {
-                    // é€‚é…ç™¾åº¦åœ°å›¾çš„é€†åœ°ç†ç¼–ç ç»“æž?
+                override fun onGetReverseGeoCodeResult(result: ReverseGeoCodeResult?) {
                     try {
-                        if (result != null) {
-                            // ä½¿ç”¨åå°„èŽ·å– address å­—æ®µ
-                            val addressField = result.javaClass.getDeclaredMethod("getAddress")
-                            val address = addressField.invoke(result) as? String
-                            
+                        if (result != null && result.error == 0) {
+                            val address = result.address
                             if (!address.isNullOrBlank()) {
                                 trySend(Result.success(address))
                             } else {
-                                trySend(Result.failure(Exception("æ— æ³•è§£æžåœ°å€")))
+                                trySend(Result.failure(Exception("No address found")))
                             }
                         } else {
-                            trySend(Result.failure(Exception("Done")))
+                            trySend(Result.failure(Exception("Reverse geocode failed")))
                         }
                     } catch (e: Exception) {
                         trySend(Result.failure(e))
@@ -158,7 +175,6 @@ class BaiduMapManager @Inject constructor(
                 }
                 
                 override fun onGetGeoCodeResult(result: GeoCodeResult?) {
-                    // ä¸ä½¿ç”?
                 }
             })
             
@@ -170,5 +186,9 @@ class BaiduMapManager @Inject constructor(
         }
         
         awaitClose {}
+    }
+    
+    companion object {
+        private const val RADIUS_EARTH = 6378137.0
     }
 }
