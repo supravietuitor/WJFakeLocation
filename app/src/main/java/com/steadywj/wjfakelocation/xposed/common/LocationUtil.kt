@@ -122,7 +122,10 @@ object LocationUtil {
         location.elapsedRealtimeNanos = System.nanoTime()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            location.isFromMockProvider = true
+            try {
+                location.javaClass.getMethod("setIsFromMockProvider", Boolean::class.javaPrimitiveType)
+                    ?.invoke(location, true)
+            } catch (_: Exception) {}
         }
         
         return location
