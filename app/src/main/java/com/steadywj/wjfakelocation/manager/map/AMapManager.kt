@@ -14,27 +14,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * 擃噸�啣蝞∠��?
- * 韐提�啣����蝝Ｗ���頧祆
- */
 @Singleton
 class AMapManager @Inject constructor() {
 
-    /**
-     * ����?SDK
-     * @param context 摨銝��?
-     */
     fun initialize(context: Context) {
-        // 擃噸�啣 SDK 隡�其� Manifest 霂餃� API Key
-        // ������?
     }
 
-    /**
-     * �啁�蝻��揣嚗�頧砍���
-     * @param address �啣�摮泵銝?
-     * @return Flow<LatLng> ��瘚?
-     */
     fun geocodeAddress(address: String): Flow<Result<LatLng>> = callbackFlow {
         val geocodeSearch = GeocodeSearch(null)
         
@@ -53,44 +38,52 @@ class AMapManager @Inject constructor() {
                             )
                         )
                     } else {
-                        trySend(Result.failure(Exception("�芣�啣���啣�")))
+                        trySend(Result.failure(Exception("Geocode failed")))
                     }
                 } else {
-                    trySend(Result.failure(Exception("�揣憭梯揖嚗?errorCode")))
+                    trySend(Result.failure(Exception("Geocode error: $errorCode")))
                 }
             }
 
             override fun onRegeocodeSearched(result: RegeocodeResult?, errorCode: Int) {
-                // ������閬?
             }
         })
 
-        val query = GeocodeQuery(address, "010") // ����舫?
+        val query = GeocodeQuery(address, "")
         geocodeSearch.getFromLocationNameAsyn(query)
 
         awaitClose {
-            // 皜�韏�
         }
     }
 
-    /**
-     * GCJ-02 頧?WGS-84
-     * 擃噸�啣餈�� GCJ-02 ��蝟鳴��閬蓮�Ｖ蛹 WGS-84 �其�摰�隡芷?
-     * @param gcjLat GCJ-02 蝥砍漲
-     * @param gcjLng GCJ-02 蝏漲
-     * @return WGS-84 �� [蝥砍漲嚗�摨因
-     */
     fun gcj02ToWgs84(gcjLat: Double, gcjLng: Double): Pair<Double, Double> {
-        return com.steadywj.wjfakelocation.xposed.common.LocationUtil.gcj02ToWgs84(gcjLat, gcjLng)
+        val ee = 0.00669342162296594323
+        val a = 6378245.0
+        
+        val dLat = transformLat(gcjLng - 105.0, gcjLat - 35.0)
+        val dLng = transformLng(gcjLng - 105.0, gcjLat - 35.0)
+        
+        val radLat = gcjLat / 180.0 * Math.PI
+        var magic = Math.sin(radLat)
+        magic = 1 - ee * magic * magic
+        
+        val sqrtMagic = Math.sqrt(magic)
+        
+        var wgsLat = gcjLat - dLat
+        var wgsLng = gcjLng - dLng
+        
+        wgsLat = wgsLat * 180.0 / Math.PI
+        wgsLng = wgsLng * 180.0 / Math.PI
+        
+        wgsLat = (2 * wgsLat - gcjLat)
+        wgsLng = (2 * wgsLng - gcjLng)
+        
+        wgsLat -= (dLat / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH)
+        wgsLng -= (dLng / sqrtMagic) * 180.0 / Math.PI * a * (1 - ee) / (magic * RADIUS_EARTH * Math.cos(radLat))
+        
+        return Pair(wgsLat, wgsLng)
     }
 
-    /**
-     * WGS-84 頧?GCJ-02
-     * 撠�琿�?WGS-84 ��頧祆銝?GCJ-02 �其��啣�曄內
-     * @param wgsLat WGS-84 蝥砍漲
-     * @param wgsLng WGS-84 蝏漲
-     * @return GCJ-02 �� [蝥砍漲嚗�摨因
-     */
     fun wgs84ToGcj02(wgsLat: Double, wgsLng: Double): Pair<Double, Double> {
         val ee = 0.00669342162296594323
         val a = 6378245.0
@@ -138,9 +131,6 @@ class AMapManager @Inject constructor() {
     }
 }
 
-/**
- * 蝏漪摨行�桃掩
- */
 data class LatLng(
     val latitude: Double,
     val longitude: Double,
