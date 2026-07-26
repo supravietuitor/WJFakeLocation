@@ -1,5 +1,5 @@
 // PreferencesUtil.kt
-package com.steadywj.wjfakelocation.xposed.utils
+package com.steadywj.wjfakelocation.xposed.common
 
 import android.content.Context
 import android.content.SharedPreferences
