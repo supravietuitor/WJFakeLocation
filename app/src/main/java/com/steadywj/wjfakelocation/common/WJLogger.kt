@@ -2,14 +2,13 @@
 package com.steadywj.wjfakelocation.common
 
 import android.util.Log
-import com.jakewharton.timber.Timber
 import com.steadywj.wjfakelocation.BuildConfig
 
 /**
  * 统一日志管理工具
  * 
  * 功能:
- * - 统一使用 Timber 进行日志记录
+ * - 统一使用 android.util.Log 进行日志记录
  * - Debug 版本自动输出日志，Release 版本禁用
  * - 支持自定义标签和日志级别
  * 
@@ -25,31 +24,17 @@ import com.steadywj.wjfakelocation.BuildConfig
  */
 object WJLogger {
     
+    private const val TAG = "WJFakeLocation"
+    private var initialized = false
+    
     /**
      * 初始化日志系统
      * 需要在 Application 的 onCreate 中调用
      */
     fun init() {
+        initialized = true
         if (BuildConfig.DEBUG) {
-            // Debug 模式：输出详细日志到 Logcat
-            Timber.plant(object : Timber.DebugTree() {
-                override fun createStackElementTag(element: StackTraceElement): String {
-                    // 显示类名和方法名
-                    return "${element.fileName}:${element.lineNumber}#${element.methodName}"
-                }
-                
-                override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                    // 添加时间戳
-                    val timestamp = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.getDefault())
-                        .format(java.util.Date())
-                    super.log(priority, tag, "[$timestamp] $message", t)
-                }
-            })
-            
-            Timber.d("WJLogger initialized in DEBUG mode")
-        } else {
-            // Release 模式：不输出日志（或可以集成崩溃收集）
-            // Timber.plant(CrashlyticsTree()) // 可选：集成 Firebase Crashlytics
+            Log.d(TAG, "WJLogger initialized in DEBUG mode")
         }
     }
     
@@ -58,9 +43,9 @@ object WJLogger {
      */
     fun v(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.v(throwable, message)
+            Log.v(TAG, message, throwable)
         } else {
-            Timber.v(message)
+            Log.v(TAG, message)
         }
     }
     
@@ -69,9 +54,9 @@ object WJLogger {
      */
     fun v(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.tag(tag).v(throwable, message)
+            Log.v(tag, message, throwable)
         } else {
-            Timber.tag(tag).v(message)
+            Log.v(tag, message)
         }
     }
     
@@ -80,9 +65,9 @@ object WJLogger {
      */
     fun d(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.d(throwable, message)
+            Log.d(TAG, message, throwable)
         } else {
-            Timber.d(message)
+            Log.d(TAG, message)
         }
     }
     
@@ -91,9 +76,9 @@ object WJLogger {
      */
     fun d(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.tag(tag).d(throwable, message)
+            Log.d(tag, message, throwable)
         } else {
-            Timber.tag(tag).d(message)
+            Log.d(tag, message)
         }
     }
     
@@ -102,9 +87,9 @@ object WJLogger {
      */
     fun i(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.i(throwable, message)
+            Log.i(TAG, message, throwable)
         } else {
-            Timber.i(message)
+            Log.i(TAG, message)
         }
     }
     
@@ -113,9 +98,9 @@ object WJLogger {
      */
     fun i(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.tag(tag).i(throwable, message)
+            Log.i(tag, message, throwable)
         } else {
-            Timber.tag(tag).i(message)
+            Log.i(tag, message)
         }
     }
     
@@ -124,9 +109,9 @@ object WJLogger {
      */
     fun w(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.w(throwable, message)
+            Log.w(TAG, message, throwable)
         } else {
-            Timber.w(message)
+            Log.w(TAG, message)
         }
     }
     
@@ -135,9 +120,9 @@ object WJLogger {
      */
     fun w(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.tag(tag).w(throwable, message)
+            Log.w(tag, message, throwable)
         } else {
-            Timber.tag(tag).w(message)
+            Log.w(tag, message)
         }
     }
     
@@ -146,9 +131,9 @@ object WJLogger {
      */
     fun e(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.e(throwable, message)
+            Log.e(TAG, message, throwable)
         } else {
-            Timber.e(message)
+            Log.e(TAG, message)
         }
     }
     
@@ -157,9 +142,9 @@ object WJLogger {
      */
     fun e(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.tag(tag).e(throwable, message)
+            Log.e(tag, message, throwable)
         } else {
-            Timber.tag(tag).e(message)
+            Log.e(tag, message)
         }
     }
     
@@ -168,16 +153,9 @@ object WJLogger {
      */
     fun wtf(message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Timber.wtf(throwable, message)
+            Log.wtf(TAG, message, throwable)
         } else {
-            Timber.wtf(message)
+            Log.wtf(TAG, message)
         }
     }
-    
-    /**
-     * 向上转型为 Timber.Tree
-     * 用于直接调用 Timber API
-     */
-    val tree: Timber.Tree
-        get() = Timber.forest().firstOrNull() ?: Timber.DebugTree()
 }
