@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * 地图 ViewModel
- * 管理地图界面的状态和业务逻辑
+ * åœ°å›¾ ViewModel
+ * ç®¡ç†åœ°å›¾ç•Œé¢çš„çŠ¶æ€å’Œä¸šåŠ¡é€»è¾‘
  */
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -26,23 +26,23 @@ class MapViewModel @Inject constructor(
     private val aMapManager: AMapManager
 ) : ViewModel() {
 
-    /** UI 状�?*/
+    /** UI çŠ¶æ€?*/
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
-    /** 选中的位�?*/
+    /** é€‰ä¸­çš„ä½ç½?*/
     private val _selectedLocation = MutableStateFlow<SelectedLocation?>(null)
     val selectedLocation: StateFlow<SelectedLocation?> = _selectedLocation.asStateFlow()
 
-    /** 是否正在运行（伪造中�?*/
+    /** æ˜¯å¦æ­£åœ¨è¿è¡Œï¼ˆä¼ªé€ ä¸­ï¼?*/
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
     /**
-     * 选择位置
-     * @param latitude 纬度
-     * @param longitude 经度
-     * @param address 地址（可选）
+     * é€‰æ‹©ä½ç½®
+     * @param latitude çº¬åº¦
+     * @param longitude ç»åº¦
+     * @param address åœ°å€ï¼ˆå¯é€‰ï¼‰
      */
     fun selectLocation(latitude: Double, longitude: Double, address: String? = null) {
         viewModelScope.launch {
@@ -53,7 +53,7 @@ class MapViewModel @Inject constructor(
     }
 
     /**
-     * 启动虚拟定位
+     * å¯åŠ¨è™šæ‹Ÿå®šä½
      */
     fun startFakeLocation() {
         viewModelScope.launch {
@@ -63,7 +63,7 @@ class MapViewModel @Inject constructor(
     }
 
     /**
-     * 停止虚拟定位
+     * åœæ­¢è™šæ‹Ÿå®šä½
      */
     fun stopFakeLocation() {
         viewModelScope.launch {
@@ -73,7 +73,7 @@ class MapViewModel @Inject constructor(
     }
 
     /**
-     * 切换虚拟定位状�?
+     * åˆ‡æ¢è™šæ‹Ÿå®šä½çŠ¶æ€?
      */
     fun toggleFakeLocation() {
         if (_isPlaying.value) {
@@ -84,8 +84,8 @@ class MapViewModel @Inject constructor(
     }
 
     /**
-     * 搜索位置（高德地图地理编码）
-     * @param query 搜索关键�?
+     * æœç´¢ä½ç½®ï¼ˆé«˜å¾·åœ°å›¾åœ°ç†ç¼–ç ï¼‰
+     * @param query æœç´¢å…³é”®è¯?
      */
     fun searchLocation(query: String) {
         if (query.isBlank()) {
@@ -101,8 +101,8 @@ class MapViewModel @Inject constructor(
             )
 
             try {
-                // 实现高德地图搜索
-                // TODO: 注入 AMapManager 并调�?geocodeAddress()
+                // å®žçŽ°é«˜å¾·åœ°å›¾æœç´¢
+                // TODO: æ³¨å…¥ AMapManager å¹¶è°ƒç”?geocodeAddress()
                 /*
                 aMapManager.geocodeAddress(query).collect { result ->
                     result.onSuccess { latLng ->
@@ -111,26 +111,26 @@ class MapViewModel @Inject constructor(
                     }.onFailure { error ->
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "搜索失败"
+                            errorMessage = error.message ?: "æœç´¢å¤±è´¥"
                         )
                     }
                 }
                 */
 
-                // 临时占位实现
+                // ä¸´æ—¶å ä½å®žçŽ°
                 delay(500L)
                 _uiState.value = _uiState.value.copy(isLoading = false)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "搜索失败"
+                    errorMessage = e.message ?: "æœç´¢å¤±è´¥"
                 )
             }
         }
     }
 
     /**
-     * 清除搜索状�?
+     * æ¸…é™¤æœç´¢çŠ¶æ€?
      */
     fun clearSearch() {
         viewModelScope.launch {
@@ -144,11 +144,11 @@ class MapViewModel @Inject constructor(
 }
 
 /**
- * 地图 UI 状�?
- * @property isLoading 加载状�?
- * @property searchQuery 搜索关键�?
- * @property errorMessage 错误消息
- * @property showAddFavoriteDialog 显示添加收藏对话�?
+ * åœ°å›¾ UI çŠ¶æ€?
+ * @property isLoading åŠ è½½çŠ¶æ€?
+ * @property searchQuery æœç´¢å…³é”®è¯?
+ * @property errorMessage é”™è¯¯æ¶ˆæ¯
+ * @property showAddFavoriteDialog æ˜¾ç¤ºæ·»åŠ æ”¶è—å¯¹è¯æ¡?
  */
 data class MapUiState(
     val isLoading: Boolean = false,
