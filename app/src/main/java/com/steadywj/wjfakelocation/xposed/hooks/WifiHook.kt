@@ -173,7 +173,7 @@ class WifiHook : IXposedHookLoadPackage {
     /**
      * 创建假连接信息
      */
-    private fun createFakeConnectionInfo(): WifiInfo {
+    private fun createFakeConnectionInfo(): Any? {
         val primaryWifi = FakeWifiInfo.getPrimaryWifi()
         
         val wifiInfo = XposedHelpers.newInstance(WifiInfo::class.java)
