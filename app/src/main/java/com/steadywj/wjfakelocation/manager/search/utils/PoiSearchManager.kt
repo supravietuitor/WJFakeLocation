@@ -164,7 +164,7 @@ enum class PoiType(val code: String, val displayName: String) {
     FOOD("food", "Food"),
     HOTEL("hotel", "Hotel"),
     SHOPPING("shopping", "Shopping"),
-    TRANSPORT("transport", "Transport"),
+    TRANSPORT("transport", "Transport")
     ENTERTAINMENT("entertainment", "Entertainment"),
     EDUCATION("Education", "Education"),
     MEDICAL("Medical", "Medical"),
