@@ -4,6 +4,7 @@ package com.steadywj.wjfakelocation.xposed.hooks
 import android.telephony.CellIdentity
 import android.telephony.CellSignalStrength
 import android.telephony.TelephonyManager
+import com.steadywj.wjfakelocation.data.model.CellType
 import com.steadywj.wjfakelocation.data.model.FakeCellInfo
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodReplacement
@@ -158,7 +159,7 @@ class TelephonyHook : IXposedHookLoadPackage {
                             "getLteRsrq" -> -5 // dB
                             "getLteRssnr" -> 20 // dB
                             "getLteCqi" -> 15 // 最大值
-                            else -> invokeOriginalMethod(param)
+                            else -> XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                         }
                     }
                 })
@@ -215,10 +216,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     // ==================== 创建各类型基站信息 ====================
     
     private fun createGsmCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoGsm = XposedHelpers.newInstance("android.telephony.CellInfoGsm")
+        val cellInfoGsm = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoGsm"))
         XposedHelpers.callMethod(cellInfoGsm, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityGsm",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityGsm"),
             fakeInfo.mcc?.toIntOrNull() ?: 460,
             fakeInfo.mnc?.toIntOrNull() ?: 0,
             fakeInfo.cid ?: 0,
@@ -232,10 +233,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createCdmaCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoCdma = XposedHelpers.newInstance("android.telephony.CellInfoCdma")
+        val cellInfoCdma = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoCdma"))
         XposedHelpers.callMethod(cellInfoCdma, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityCdma",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityCdma"),
             fakeInfo.basestationId ?: 0,
             fakeInfo.longitude ?: 0.0,
             fakeInfo.latitude ?: 0.0,
@@ -248,10 +249,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createLteCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoLte = XposedHelpers.newInstance("android.telephony.CellInfoLte")
+        val cellInfoLte = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoLte"))
         XposedHelpers.callMethod(cellInfoLte, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityLte",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityLte"),
             fakeInfo.mcc?.toIntOrNull() ?: 460,
             fakeInfo.mnc?.toIntOrNull() ?: 0,
             fakeInfo.ci ?: fakeInfo.cid ?: 0,
@@ -266,10 +267,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createWcdmaCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoWcdma = XposedHelpers.newInstance("android.telephony.CellInfoWcdma")
+        val cellInfoWcdma = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoWcdma"))
         XposedHelpers.callMethod(cellInfoWcdma, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityWcdma",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityWcdma"),
             fakeInfo.mcc?.toIntOrNull() ?: 460,
             fakeInfo.mnc?.toIntOrNull() ?: 0,
             fakeInfo.cid ?: 0,
@@ -284,10 +285,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createTdscdmaCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoTdscdma = XposedHelpers.newInstance("android.telephony.CellInfoTdscdma")
+        val cellInfoTdscdma = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoTdscdma"))
         XposedHelpers.callMethod(cellInfoTdscdma, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityTdscdma",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityTdscdma"),
             fakeInfo.mcc?.toIntOrNull() ?: 460,
             fakeInfo.mnc?.toIntOrNull() ?: 0,
             fakeInfo.cid ?: 0,
@@ -302,10 +303,10 @@ class TelephonyHook : IXposedHookLoadPackage {
     }
     
     private fun createNrCellInfo(fakeInfo: FakeCellInfo, isRegistered: Boolean): Any {
-        val cellInfoNr = XposedHelpers.newInstance("android.telephony.CellInfoNr")
+        val cellInfoNr = XposedHelpers.newInstance(Class.forName("android.telephony.CellInfoNr"))
         XposedHelpers.callMethod(cellInfoNr, "setRegistered", isRegistered)
         
-        val cellIdentity = XposedHelpers.newInstance("android.telephony.CellIdentityNr",
+        val cellIdentity = XposedHelpers.newInstance(Class.forName("android.telephony.CellIdentityNr"),
             fakeInfo.mcc?.toIntOrNull() ?: 460,
             fakeInfo.mnc?.toIntOrNull() ?: 0,
             fakeInfo.nci ?: fakeInfo.cid ?: 0,
@@ -340,9 +341,5 @@ class TelephonyHook : IXposedHookLoadPackage {
         // 从 Preferences 读取开关状态
         // TODO: 注入 PreferencesRepository 或使用静态方法读取
         return true // 默认启用
-    }
-    
-    private enum class CellType {
-        GSM, CDMA, LTE, WCDMA, TDSCDMA, NR
     }
 }
