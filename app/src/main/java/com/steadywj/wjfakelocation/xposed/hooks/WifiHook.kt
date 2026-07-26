@@ -6,6 +6,8 @@ import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import com.steadywj.wjfakelocation.data.model.FakeWifiInfo
 import com.steadywj.wjfakelocation.data.model.SecurityType
+import com.steadywj.wjfakelocation.data.model.WifiBand
+import java.net.Inet4Address
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
@@ -44,7 +46,7 @@ class WifiHook : IXposedHookLoadPackage {
                 @Throws(Throwable::class.java)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                     
                     try {
@@ -53,7 +55,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeWifiList
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假 WiFi 列表失败：${e.message}")
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                 }
             })
@@ -73,7 +75,7 @@ class WifiHook : IXposedHookLoadPackage {
                 @Throws(Throwable::class.java)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                     
                     try {
@@ -82,7 +84,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeInfo
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假连接信息失败：${e.message}")
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                 }
             })
@@ -102,7 +104,7 @@ class WifiHook : IXposedHookLoadPackage {
                 @Throws(Throwable::class.java)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                     
                     try {
@@ -111,7 +113,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeConfigs
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假配置网络失败：${e.message}")
-                        return invokeOriginalMethod(param)
+                        return param.method.invoke(param.thisObject, *param.args)
                     }
                 }
             })
@@ -152,7 +154,7 @@ class WifiHook : IXposedHookLoadPackage {
                 scanResult.capabilities = buildCapabilities(wifiInfo.securityType)
                 
                 // 时间戳
-                scanResult.timestampNanos = System.nanoTime()
+                XposedHelpers.setLongField(scanResult, "timestampNanos", System.nanoTime())
                 
                 // Channel width (80MHz, 160MHz)
                 if (wifiInfo.band == WifiBand.GHZ_5 || wifiInfo.band == WifiBand.GHZ_6) {
@@ -205,7 +207,7 @@ class WifiHook : IXposedHookLoadPackage {
         
         // IP 地址
         XposedHelpers.callMethod(wifiInfo, "setIpAddress", 
-            android.net.Inet4Address.parseNumericAddress("192.168.1.100").address
+            Inet4Address.getByName("192.168.1.100").address
         )
         
         return wifiInfo
@@ -236,10 +238,10 @@ class WifiHook : IXposedHookLoadPackage {
                 // 加密协议
                 when (wifiInfo.securityType) {
                     SecurityType.WPA2_PSK -> {
-                        XposedHelpers.setBooleanArrayField(config, "protoTypes", booleanArrayOf(true, false, false))
+                        XposedHelpers.setObjectField(config, "protoTypes", booleanArrayOf(true, false, false))
                     }
                     SecurityType.WPA3_SAE -> {
-                        XposedHelpers.setBooleanArrayField(config, "protoTypes", booleanArrayOf(false, true, false))
+                        XposedHelpers.setObjectField(config, "protoTypes", booleanArrayOf(false, true, false))
                     }
                     else -> {}
                 }
