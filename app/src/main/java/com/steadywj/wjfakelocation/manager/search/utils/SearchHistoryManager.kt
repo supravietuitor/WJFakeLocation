@@ -262,7 +262,7 @@ enum class POICategory(val displayName: String) {
     FOOD("Food"),
     HOTEL("Hotel"),
     SHOPPING("Shopping"),
-    TRANSPORT("äº¤é€?),
+    TRANSPORT("Transport"),
     EDUCATION("Education"),
     MEDICAL("Medical"),
     ENTERTAINMENT("Entertainment"),
