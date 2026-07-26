@@ -7,10 +7,10 @@ import android.view.MotionEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import com.amap.api.maps2d.AMap
-import com.amap.api.maps2d.model.LatLng
-import com.amap.api.maps2d.model.Marker
-import com.amap.api.maps2d.model.MarkerOptions
+import com.amap.api.maps.AMap
+import com.amap.api.maps.model.LatLng
+import com.amap.api.maps.model.Marker
+import com.amap.api.maps.model.MarkerOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -69,7 +69,7 @@ class MapInteractionManager @Inject constructor() {
                 )?.let { latLng ->
                     // 隞亦�颱�蝵桐蛹銝剖��曉之
                     aMap.animateMap(
-                        com.amap.api.maps2d.CameraUpdateFactory.newLatLngZoom(
+                        com.amap.api.maps.CameraUpdateFactory.newLatLngZoom(
                             latLng,
                             (aMap.cameraPosition.zoom + 2).coerceIn(3f, 18f)
                         )
@@ -151,14 +151,14 @@ class MapInteractionManager @Inject constructor() {
                 .title(title)
                 .snippet("${latLng.latitude}, ${latLng.longitude}")
                 .draggable(true) // �舀��?
-                .icon(com.amap.api.maps2d.model.BitmapDescriptorFactory.defaultMarker())
+                .icon(com.amap.api.maps.model.BitmapDescriptorFactory.defaultMarker())
             
             val marker = aMap.addMarker(markerOptions)
             _currentMarker.value = marker
             
             // 蝘餃�唳�霈啁雿蔭
             aMap.animateMap(
-                com.amap.api.maps2d.CameraUpdateFactory.newLatLng(latLng)
+                com.amap.api.maps.CameraUpdateFactory.newLatLng(latLng)
             )
             
             return marker
