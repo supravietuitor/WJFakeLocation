@@ -18,24 +18,24 @@ import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.MarkerOptions
 
 /**
- * é«˜å¾·åœ°å›¾ MapView åŒ…è£…ç»„ä»¶ï¼ˆä¼˜åŒ–ç‰ˆï¼?
+ * 高德地图 MapView 包装组件（优化版）
  * 
- * ç‰¹æ€?
- * - é¢„åŠ è½½ç¼“å­?
- * - åŠ è½½è¿›åº¦æŒ‡ç¤ºå™?
- * - ç”Ÿå‘½å‘¨æœŸè‡ªåŠ¨ç®¡ç†
+ * 特性:
+ * - 预加载缓冲
+ * - 加载进度指示器
+ * - 生命周期自动管理
  * 
- * @param modifier Compose ä¿®é¥°ç¬?
- * @param onMapReady åœ°å›¾å‡†å¤‡å°±ç»ªå›žè°ƒ
- * @param initialLatitude åˆå§‹çº¬åº¦
- * @param initialLongitude åˆå§‹ç»åº¦
- * @param zoomLevel ç¼©æ”¾çº§åˆ«ï¼ˆé»˜è®?15ï¼?
+ * @param modifier Compose 修饰符
+ * @param onMapReady 地图准备就绪回调
+ * @param initialLatitude 初始纬度
+ * @param initialLongitude 初始经度
+ * @param zoomLevel 缩放级别（默认15）
  */
 @Composable
 fun AMapView(
     modifier: Modifier = Modifier,
     onMapReady: ((AMap) -> Unit)? = null,
-    initialLatitude: Double = 39.908823, // åŒ—äº¬
+    initialLatitude: Double = 39.908823,
     initialLongitude: Double = 116.397470,
     zoomLevel: Float = 15f
 ) {
@@ -50,32 +50,27 @@ fun AMapView(
                 MapView(ctx).apply {
                     mapView = this
                     
-                    // èŽ·å– AMap å®žä¾‹
-                    getMapAsync { map ->
+                    onCreate(null)
+                    val map = getMap()
+                    if (map != null) {
                         aMap = map
                         
-                        // è®¾ç½®åˆå§‹ä½ç½®å’Œç¼©æ”¾çº§åˆ?
                         val latLng = LatLng(initialLatitude, initialLongitude)
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
                         
-                        // å¯ç”¨å®šä½å›¾å±‚ï¼ˆéœ€è¦æƒé™ï¼‰
                         map.isMyLocationEnabled = true
                         
-                        // æ ‡è®°ä¸ºå·²åŠ è½½
                         isMapLoaded = true
                         
-                        // é€šçŸ¥åœ°å›¾å·²å‡†å¤‡å¥½
                         onMapReady?.invoke(map)
                     }
                 }
             },
             modifier = Modifier.fillMaxSize(),
             update = { view ->
-                // å¯ä»¥åœ¨è¿™é‡Œæ›´æ–°åœ°å›¾é…ç½?
             }
         )
         
-        // æ˜¾ç¤ºåŠ è½½è¿›åº¦æŒ‡ç¤ºå™?
         if (!isMapLoaded) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -86,14 +81,14 @@ fun AMapView(
 }
 
 /**
- * åœ¨åœ°å›¾ä¸Šæ·»åŠ æ ‡è®°ç‚?
+ * 在地图上添加标记点
  * 
- * @param latitude çº¬åº¦
- * @param longitude ç»åº¦
- * @param title æ ‡é¢˜
- * @param snippet æè¿°ä¿¡æ¯
- * @param draggable æ˜¯å¦å¯æ‹–æ‹½ï¼ˆé»˜è®¤ trueï¼?
- * @param onClick ç‚¹å‡»å›žè°ƒ
+ * @param latitude 纬度
+ * @param longitude 经度
+ * @param title 标题
+ * @param snippet 描述信息
+ * @param draggable 是否可拖拽（默认 true）
+ * @param onClick 点击回调
  */
 @Composable
 fun MapMarker(
@@ -117,7 +112,6 @@ fun MapMarker(
             
             marker = map.addMarker(markerOptions)
             
-            // è®¾ç½®ç‚¹å‡»ç›‘å¬å™?
             if (onClick != null) {
                 map.setOnMarkerClickListener { clickedMarker ->
                     if (clickedMarker == marker) {
@@ -131,15 +125,14 @@ fun MapMarker(
         }
         
         onDispose {
-            // æ¸…ç†æ ‡è®°ç‚?
             marker?.remove()
         }
     }
 }
 
 /**
- * é«˜å¾·åœ°å›¾ç”Ÿå‘½å‘¨æœŸç®¡ç†
- * éœ€è¦åœ¨ Composable ä¸­è°ƒç”¨ä»¥æ­£ç¡®å¤„ç†ç”Ÿå‘½å‘¨æœŸ
+ * 高德地图生命周期管理
+ * 需要在 Composable 中调用以正确处理生命周期
  */
 @Composable
 fun AMapLifecycleHandler(mapView: MapView?) {
