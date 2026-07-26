@@ -62,7 +62,7 @@ fun AddFavoriteDialog(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Done) },
+                            text = { Text("Done") },
                             onClick = {
                                 category = "home"
                                 expanded = false
