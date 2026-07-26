@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.steadywj.wjfakelocation.data.SHARED_PREFS_FILE
 import com.steadywj.wjfakelocation.data.model.LocationSettings
 import com.steadywj.wjfakelocation.data.model.SelectedLocation
 import com.steadywj.wjfakelocation.data.model.TargetMode
@@ -67,8 +66,8 @@ class PreferencesRepository @Inject constructor(
     }
     
     private fun getSelectedLocation(): SelectedLocation? {
-        val lat = prefs.getDouble("selected_latitude", Double.MIN_VALUE)
-        val lng = prefs.getDouble("selected_longitude", Double.MIN_VALUE)
+        val lat = prefs.getFloat("selected_latitude", Double.MIN_VALUE.toFloat()).toDouble()
+        val lng = prefs.getFloat("selected_longitude", Double.MIN_VALUE.toFloat()).toDouble()
         return if (lat != Double.MIN_VALUE && lng != Double.MIN_VALUE) {
             SelectedLocation(
                 latitude = lat,
@@ -88,8 +87,8 @@ class PreferencesRepository @Inject constructor(
     suspend fun updateSelectedLocation(location: SelectedLocation?) {
         prefs.edit().apply {
             if (location != null) {
-                putDouble("selected_latitude", location.latitude)
-                putDouble("selected_longitude", location.longitude)
+                putFloat("selected_latitude", location.latitude.toFloat())
+                putFloat("selected_longitude", location.longitude.toFloat())
                 putString("selected_address", location.address)
             } else {
                 remove("selected_latitude")
@@ -144,7 +143,6 @@ class PreferencesRepository @Inject constructor(
     suspend fun saveProfile(name: String, settings: LocationSettings) {
         val profileKey = "profile_$name"
         prefs.edit().apply {
-            // 使用 JSON 格式完整保存所有设置
             putString("${profileKey}_data", 
                 "${settings.useAccuracy}|${settings.accuracy}|${settings.useAltitude}|${settings.altitude}|" +
                 "${settings.useRandomize}|${settings.randomizeRadius}|${settings.useVerticalAccuracy}|${settings.verticalAccuracy}|" +
@@ -162,14 +160,13 @@ class PreferencesRepository @Inject constructor(
     }
     
     private fun serializeSettings(settings: LocationSettings): String {
-        // 保留向后兼容的序列化方法
         return "${settings.useAccuracy}|${settings.accuracy}|${settings.useAltitude}|${settings.altitude}|" +
                "${settings.useRandomize}|${settings.randomizeRadius}|${settings.useVerticalAccuracy}|${settings.verticalAccuracy}|" +
                "${settings.useMeanSeaLevel}|${settings.meanSeaLevel}|${settings.useMeanSeaLevelAccuracy}|${settings.meanSeaLevelAccuracy}|" +
                "${settings.useSpeed}|${settings.speed}|${settings.useSpeedAccuracy}|${settings.speedAccuracy}"
     }
     
-    private fun deserializeSettings(data: String): LocationSettings {
+    private fun deserializeSettings(data: String): LocationSettings? {
         try {
             val parts = data.split("|")
             if (parts.size < 16) return null
@@ -197,3 +194,5 @@ class PreferencesRepository @Inject constructor(
         }
     }
 }
+
+private const val SHARED_PREFS_FILE = "wjfakelocation_shared_prefs"
