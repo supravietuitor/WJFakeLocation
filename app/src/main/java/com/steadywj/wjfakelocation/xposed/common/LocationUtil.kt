@@ -1,5 +1,5 @@
 // LocationUtil.kt
-package com.steadywj.wjfakelocation.xposed.utils
+package com.steadywj.wjfakelocation.xposed.common
 
 import android.location.Location
 import android.os.Build
