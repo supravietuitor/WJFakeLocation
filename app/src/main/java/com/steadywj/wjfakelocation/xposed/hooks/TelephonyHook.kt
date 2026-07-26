@@ -213,9 +213,9 @@ class TelephonyHook : IXposedHookLoadPackage {
             CellType.GSM -> createGsmCellLocation(fakeInfo)
             CellType.CDMA -> createCdmaCellLocation(fakeInfo)
             CellType.LTE -> createLteCellLocation(fakeInfo)
-            CellType.WCDMA -> createWcdmaCellLocation(fakeInfo)
-            CellType.TDSCDMA -> createTdscdmaCellLocation(fakeInfo)
-            CellType.NR -> createNrCellLocation(fakeInfo)
+            CellType.WCDMA -> createGsmCellLocation(fakeInfo)
+            CellType.TDSCDMA -> createGsmCellLocation(fakeInfo)
+            CellType.NR -> createGsmCellLocation(fakeInfo)
         }
     }
     
