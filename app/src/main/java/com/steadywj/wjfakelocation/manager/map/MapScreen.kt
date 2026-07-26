@@ -1,6 +1,7 @@
 // MapScreen.kt
 package com.steadywj.wjfakelocation.manager.map
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -13,14 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.steadywj.wjfakelocation.R
+import com.steadywj.wjfakelocation.manager.map.components.AMapView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onNavigateToSettings: () -> Unit,
-    onNavigateToFavorites: () -> Unit
+    onNavigateToFavorites: () -> Unit,
+    onLocationSelected: ((Double, Double) -> Unit)? = null
 ) {
     var showDrawer by remember { mutableStateOf(false) }
+    var currentLat by remember { mutableDoubleStateOf(39.908823) }
+    var currentLng by remember { mutableDoubleStateOf(116.397470) }
+    var zoomLevel by remember { mutableFloatStateOf(15f) }
     
     Scaffold(
         topBar = {
@@ -28,26 +34,25 @@ fun MapScreen(
                 title = { Text(stringResource(id = R.string.nav_map)) },
                 navigationIcon = {
                     IconButton(onClick = { showDrawer = true }) {
-                        Icon(Icons.Default.Menu, contentDescription = "菜单")
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* 搜索功能 */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "搜索")
+                    IconButton(onClick = { /* Search */ }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* 定位到当前位�?*/ },
+                onClick = { /* Locate current position */ },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.MyLocation, contentDescription = "当前位置")
+                Icon(Icons.Default.MyLocation, contentDescription = "Current location")
             }
         }
     ) { paddingValues ->
-        // 集成高德地图 MapView
         AMapView(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,11 +61,7 @@ fun MapScreen(
             initialLongitude = currentLng,
             zoomLevel = zoomLevel,
             onMapReady = { aMap ->
-                Log.d("MapScreen", "高德地图加载完成")
-            },
-            onMapClick = { lat, lng ->
-                // 点击地图回调
-                onLocationSelected?.invoke(lat, lng)
+                Log.d("MapScreen", "AMap loaded")
             }
         )
     }
