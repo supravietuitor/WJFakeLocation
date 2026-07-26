@@ -216,7 +216,7 @@ data class Placemark(
     var name: String? = null,
     var description: String? = null,
     var geometryType: String = "Point",
-    val coordinates: List<TrackPoint> = emptyList()
+    var coordinates: List<TrackPoint> = emptyList()
 ) {
     /**
      * 是否为点
