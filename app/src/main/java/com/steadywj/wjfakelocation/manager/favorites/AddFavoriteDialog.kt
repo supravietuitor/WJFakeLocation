@@ -29,8 +29,8 @@ fun AddFavoriteDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("名称") },
-                    placeholder = { Text("输入地点名称") },
+                    label = { Text("åç§°") },
+                    placeholder = { Text("è¾“å…¥åœ°ç‚¹åç§°") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 
@@ -43,7 +43,7 @@ fun AddFavoriteDialog(
                         value = category,
                         onValueChange = { },
                         readOnly = true,
-                        label = { Text("分类") },
+                        label = { Text("åˆ†ç±»") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -55,28 +55,28 @@ fun AddFavoriteDialog(
                         onDismissRequest = { expanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("默认") },
+                            text = { Text("é»˜è®¤") },
                             onClick = {
                                 category = "default"
                                 expanded = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("�?) },
+                            text = { Text("Done) },
                             onClick = {
                                 category = "home"
                                 expanded = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("公司") },
+                            text = { Text("å…¬å¸") },
                             onClick = {
                                 category = "work"
                                 expanded = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("其他") },
+                            text = { Text("å…¶ä»–") },
                             onClick = {
                                 category = "other"
                                 expanded = false
