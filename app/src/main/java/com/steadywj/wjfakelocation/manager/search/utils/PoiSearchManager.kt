@@ -2,7 +2,6 @@ package com.steadywj.wjfakelocation.manager.search.utils
 
 import android.content.Context
 import com.amap.api.services.core.LatLonPoint
-import com.amap.api.services.poisearch.PoiResult
 import com.amap.api.services.poisearch.PoiSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -33,26 +32,41 @@ class PoiSearchManager @Inject constructor(
                 poiSearch.setBound(PoiSearch.SearchBound(LatLonPoint(latitude, longitude), radius))
 
                 poiSearch.setOnPoiSearchListener(object : PoiSearch.OnPoiSearchListener {
-                    override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
+                    override fun onPoiSearched(result: com.amap.api.services.poisearch.PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
-                            val pois = result.pois.mapNotNull { poiItem ->
-                                try {
-                                    PoiResult(
-                                        id = poiItem.poiId,
-                                        name = poiItem.title,
-                                        type = poiItem.type,
-                                        address = poiItem.snippet ?: "",
-                                        latitude = poiItem.latLonPoint.latitude,
-                                        longitude = poiItem.latLonPoint.longitude,
-                                        distance = poiItem.distance,
-                                        tel = poiItem.tel,
-                                        rating = null
-                                    )
-                                } catch (e: Exception) {
-                                    null
+                            try {
+                                val poisList = result.pois
+                                if (poisList != null) {
+                                    val pois = mutableListOf<PoiResult>()
+                                    for (i in 0 until poisList.size) {
+                                        val poiItem = poisList[i]
+                                        val id = poiItem?.poiId ?: continue
+                                        val title = poiItem.title ?: ""
+                                        val snippet = poiItem.snippet ?: ""
+                                        val point = poiItem.latLonPoint
+                                        val lat = point?.latitude ?: latitude
+                                        val lng = point?.longitude ?: longitude
+                                        val dist = try { poiItem.distance.toFloat() } catch (_: Exception) { 0f }
+                                        val tel = try { poiItem.tel } catch (_: Exception) { null }
+                                        pois.add(PoiResult(
+                                            id = id,
+                                            name = title,
+                                            type = "",
+                                            address = snippet,
+                                            latitude = lat,
+                                            longitude = lng,
+                                            distance = dist,
+                                            tel = tel,
+                                            rating = null
+                                        ))
+                                    }
+                                    trySend(pois)
+                                } else {
+                                    trySend(emptyList())
                                 }
+                            } catch (e: Exception) {
+                                trySend(emptyList())
                             }
-                            trySend(pois)
                         } else {
                             trySend(emptyList())
                         }
@@ -84,26 +98,41 @@ class PoiSearchManager @Inject constructor(
                 val poiSearch = PoiSearch(context, query)
 
                 poiSearch.setOnPoiSearchListener(object : PoiSearch.OnPoiSearchListener {
-                    override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
+                    override fun onPoiSearched(result: com.amap.api.services.poisearch.PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
-                            val pois = result.pois.mapNotNull { poiItem ->
-                                try {
-                                    PoiResult(
-                                        id = poiItem.poiId,
-                                        name = poiItem.title,
-                                        type = poiItem.type,
-                                        address = poiItem.snippet ?: "",
-                                        latitude = poiItem.latLonPoint.latitude,
-                                        longitude = poiItem.latLonPoint.longitude,
-                                        distance = poiItem.distance,
-                                        tel = poiItem.tel,
-                                        rating = null
-                                    )
-                                } catch (e: Exception) {
-                                    null
+                            try {
+                                val poisList = result.pois
+                                if (poisList != null) {
+                                    val pois = mutableListOf<PoiResult>()
+                                    for (i in 0 until poisList.size) {
+                                        val poiItem = poisList[i]
+                                        val id = poiItem?.poiId ?: continue
+                                        val title = poiItem.title ?: ""
+                                        val snippet = poiItem.snippet ?: ""
+                                        val point = poiItem.latLonPoint
+                                        val lat = point?.latitude ?: 0.0
+                                        val lng = point?.longitude ?: 0.0
+                                        val dist = try { poiItem.distance.toFloat() } catch (_: Exception) { 0f }
+                                        val tel = try { poiItem.tel } catch (_: Exception) { null }
+                                        pois.add(PoiResult(
+                                            id = id,
+                                            name = title,
+                                            type = "",
+                                            address = snippet,
+                                            latitude = lat,
+                                            longitude = lng,
+                                            distance = dist,
+                                            tel = tel,
+                                            rating = null
+                                        ))
+                                    }
+                                    trySend(pois)
+                                } else {
+                                    trySend(emptyList())
                                 }
+                            } catch (e: Exception) {
+                                trySend(emptyList())
                             }
-                            trySend(pois)
                         } else {
                             trySend(emptyList())
                         }
