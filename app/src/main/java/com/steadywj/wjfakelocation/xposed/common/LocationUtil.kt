@@ -16,6 +16,8 @@ import java.util.Random
  */
 object LocationUtil {
     
+    private const val RADIUS_EARTH = 6378137.0 // 地球半径（米）
+    
     // 目标位置（从设置读取）
     var latitude: Double = 39.9042 // 默认北京
     var longitude: Double = 116.4074
@@ -57,24 +59,6 @@ object LocationUtil {
     fun updateLocation() {
         // TODO: 从 PreferencesRepository 读取最新设置
         // 这里仅作示例，实际应从加密的 SharedPreferences 读取
-        
-        // 示例：读取上次选中的位置
-        /*
-        val prefs = // 获取 SharedPreferences
-        latitude = prefs.getDouble("selected_latitude", 39.9042)
-        longitude = prefs.getDouble("selected_longitude", 116.4074)
-        
-        useAccuracy = prefs.getBoolean("use_accuracy", false)
-        accuracy = prefs.getFloat("accuracy", 10.0f)
-        
-        useAltitude = prefs.getBoolean("use_altitude", false)
-        altitude = prefs.getFloat("altitude", 50.0).toDouble()
-        
-        useRandomize = prefs.getBoolean("use_randomize", false)
-        randomizeRadius = prefs.getFloat("randomize_radius", 0.0).toDouble()
-        
-        // ... 读取其他设置
-        */
     }
     
     /**
@@ -155,10 +139,6 @@ object LocationUtil {
             return Pair(lat, lng)
         }
         
-        // 在指定半径内生成随机偏移
-        // 1 度纬度 ≈ 111km
-        // 1 度经度 ≈ 111km * cos(纬度)
-        
         val randomAngle = random.nextDouble() * 2 * Math.PI
         val randomDistance = random.nextDouble() * randomizeRadius
         
@@ -218,10 +198,5 @@ object LocationUtil {
         ret += (20.0 * Math.sin(lng * Math.PI) + 40.0 * Math.sin(lng / 3.0 * Math.PI)) * 2.0 / 3.0
         ret += (150.0 * Math.sin(lng / 12.0 * Math.PI) + 300.0 * Math.sin(lng / 30.0 * Math.PI)) * 2.0 / 3.0
         return ret
-    }
-    
-    companion object {
-        private const val RADIUS_EARTH = 6378137.0 // 地球半径（米）
-        private const val PI = 3.14159265359
     }
 }
