@@ -137,6 +137,10 @@ object WJLogger {
         }
     }
     
+    fun e(throwable: Throwable, message: String) {
+        Log.e(TAG, message, throwable)
+    }
+    
     /**
      * 输出 ERROR 级别日志（带自定义 TAG）
      */
