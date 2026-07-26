@@ -14,12 +14,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * POI 搜索管理�?
+ * POI æœç´¢ç®¡ç†å™?
  * 
- * 功能:
- * - 周边搜索（美食、酒店等�?
- * - POI 分类筛�?
- * - 关键词搜�?
+ * åŠŸèƒ½:
+ * - å‘¨è¾¹æœç´¢ï¼ˆç¾Žé£Ÿã€é…’åº—ç­‰ï¼?
+ * - POI åˆ†ç±»ç­›é€?
+ * - å…³é”®è¯æœç´?
  */
 @Singleton
 class PoiSearchManager @Inject constructor(
@@ -27,12 +27,12 @@ class PoiSearchManager @Inject constructor(
 ) {
     
     /**
-     * 周边搜索
-     * @param latitude 纬度
-     * @param longitude 经度
-     * @param radius 半径（米），默认 3000 �?
-     * @param type POI 类型（餐饮、酒店等�?
-     * @return POI 列表
+     * å‘¨è¾¹æœç´¢
+     * @param latitude çº¬åº¦
+     * @param longitude ç»åº¦
+     * @param radius åŠå¾„ï¼ˆç±³ï¼‰ï¼Œé»˜è®¤ 3000 ç±?
+     * @param type POI ç±»åž‹ï¼ˆé¤é¥®ã€é…’åº—ç­‰ï¼?
+     * @return POI åˆ—è¡¨
      */
     fun searchNearby(
         latitude: Double,
@@ -43,15 +43,15 @@ class PoiSearchManager @Inject constructor(
         withContext(Dispatchers.IO) {
             try {
                 val poiSearch = PoiSearch(context, "")
-                val query = PoiSearch.Query("", type.code, "北京�?) // 城市
+                val query = PoiSearch.Query("", type.code, "åŒ—äº¬å¸?) // åŸŽå¸‚
                 
-                // 设置范围
-                query.setPageSize(20) // 每页 20 �?
-                query.setPageNum(1) // �?1 �?
+                // è®¾ç½®èŒƒå›´
+                query.setPageSize(20) // æ¯é¡µ 20 æ?
+                query.setPageNum(1) // ç¬?1 é¡?
                 
                 poiSearch.query = query
                 
-                // 设置周边搜索中心�?
+                // è®¾ç½®å‘¨è¾¹æœç´¢ä¸­å¿ƒç‚?
                 poiSearch.setBound(LatLonPoint(latitude, longitude), radius)
                 
                 poiSearch.setOnPoiSearchListener(object : PoiSearch.OnPoiSearchListener {
@@ -67,11 +67,11 @@ class PoiSearchManager @Inject constructor(
                     }
                     
                     override fun onPoiItemSearched(poiItem: PoiItem?, errorCode: Int) {
-                        // 单个 POI 搜索结果（不使用�?
+                        // å•ä¸ª POI æœç´¢ç»“æžœï¼ˆä¸ä½¿ç”¨ï¼?
                     }
                 })
                 
-                // 执行搜索
+                // æ‰§è¡Œæœç´¢
                 poiSearch.searchPOIAsyn()
             } catch (e: Exception) {
                 trySend(emptyList())
@@ -82,14 +82,14 @@ class PoiSearchManager @Inject constructor(
     }
     
     /**
-     * 关键词搜�?
-     * @param keyword 关键�?
-     * @param city 城市
-     * @return POI 列表
+     * å…³é”®è¯æœç´?
+     * @param keyword å…³é”®è¯?
+     * @param city åŸŽå¸‚
+     * @return POI åˆ—è¡¨
      */
     fun searchByKeyword(
         keyword: String,
-        city: String = "全国"
+        city: String = "å…¨å›½"
     ): Flow<List<PoiResult>> = callbackFlow {
         withContext(Dispatchers.IO) {
             try {
@@ -114,7 +114,7 @@ class PoiSearchManager @Inject constructor(
                     }
                     
                     override fun onPoiItemSearched(poiItem: PoiItem?, errorCode: Int) {
-                        // 单个 POI 搜索结果
+                        // å•ä¸ª POI æœç´¢ç»“æžœ
                     }
                 })
                 
@@ -128,22 +128,22 @@ class PoiSearchManager @Inject constructor(
     }
     
     /**
-     * 获取热门推荐
-     * @return 热门 POI 类型列表
+     * èŽ·å–çƒ­é—¨æŽ¨è
+     * @return çƒ­é—¨ POI ç±»åž‹åˆ—è¡¨
      */
     fun getPopularTypes(): List<PoiType> {
         return listOf(
-            PoiType.FOOD,         // 美食
-            PoiType.HOTEL,        // 酒店
-            PoiType.SHOPPING,     // 购物
-            PoiType.TRANSPORT,    // 交�?
-            PoiType.ENTERTAINMENT // 娱乐
+            PoiType.FOOD,         // ç¾Žé£Ÿ
+            PoiType.HOTEL,        // é…’åº—
+            PoiType.SHOPPING,     // è´­ç‰©
+            PoiType.TRANSPORT,    // äº¤é€?
+            PoiType.ENTERTAINMENT // å¨±ä¹
         )
     }
 }
 
 /**
- * POI 结果
+ * POI ç»“æžœ
  */
 data class PoiResult(
     val id: String,
@@ -152,30 +152,30 @@ data class PoiResult(
     val address: String,
     val latitude: Double,
     val longitude: Double,
-    val distance: Float?, // 距离（米�?
-    val tel: String?, // 电话
-    val rating: Float? // 评分
+    val distance: Float?, // è·ç¦»ï¼ˆç±³ï¼?
+    val tel: String?, // ç”µè¯
+    val rating: Float? // è¯„åˆ†
 )
 
 /**
- * POI 类型枚举（高德地�?POI 编码�?
+ * POI ç±»åž‹æžšä¸¾ï¼ˆé«˜å¾·åœ°å›?POI ç¼–ç ï¼?
  */
 enum class PoiType(val code: String, val displayName: String) {
-    FOOD("餐饮服务", "美食"),
-    HOTEL("住宿服务", "酒店"),
-    SHOPPING("购物服务", "购物"),
-    TRANSPORT("交通设�?, "交�?),
-    ENTERTAINMENT("休闲娱乐", "娱乐"),
-    EDUCATION("教育培训", "教育"),
-    MEDICAL("医疗服务", "医疗"),
-    FINANCE("金融保险", "金融"),
-    GOVERNMENT("政府机构", "政府"),
-    TOURIST("旅游景点", "旅游"),
-    DEFAULT("", "全部")
+    FOOD("é¤é¥®æœåŠ¡", "ç¾Žé£Ÿ"),
+    HOTEL("ä½å®¿æœåŠ¡", "é…’åº—"),
+    SHOPPING("è´­ç‰©æœåŠ¡", "è´­ç‰©"),
+    TRANSPORT("äº¤é€šè®¾æ–?, "äº¤é€?),
+    ENTERTAINMENT("ä¼‘é—²å¨±ä¹", "å¨±ä¹"),
+    EDUCATION("Education", "Education"),
+    MEDICAL("Medical", "Medical"),
+    FINANCE("Finance", "Finance"),
+    GOVERNMENT("Government", "Government"),
+    TOURIST("Tourist", "Tourist"),
+    DEFAULT("", "Default")
 }
 
 /**
- * PoiItem 扩展函数
+ * PoiItem æ‰©å±•å‡½æ•°
  */
 fun PoiItem.toPoiResult(): PoiResult {
     return PoiResult(
@@ -187,6 +187,6 @@ fun PoiItem.toPoiResult(): PoiResult {
         longitude = this.latLonPoint.longitude,
         distance = this.distance,
         tel = this.tel,
-        rating = null // 高德 POI 不直接提供评分，需要额外查�?
+        rating = null // é«˜å¾· POI ä¸ç›´æŽ¥æä¾›è¯„åˆ†ï¼Œéœ€è¦é¢å¤–æŸ¥è¯?
     )
 }
