@@ -64,7 +64,7 @@ class SystemServicesHooks(val appLpparam: LoadPackageParam) {
                 object : XC_MethodHook() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         XposedBridge.log("$tag [SystemHook] Entered method callLocationChangedLocked(location)")
-                        val fakeLocation = LocationUtil.createFakeLocation(param.args[0] as? Location)
+                        val fakeLocation = LocationUtil.createFakeLocation((param.args[0] as? Location)?.provider ?: "gps")
                         param.args[0] = fakeLocation
                         XposedBridge.log("\t Modified to: $fakeLocation")
                     }
