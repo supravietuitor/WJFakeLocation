@@ -4,7 +4,6 @@ package com.steadywj.wjfakelocation.xposed
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
-import com.steadywj.wjfakelocation.data.MANAGER_APP_PACKAGE_NAME
 import com.steadywj.wjfakelocation.xposed.hooks.LocationApiHooks
 import com.steadywj.wjfakelocation.xposed.hooks.SystemServicesHooks
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -14,6 +13,9 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 
 class MainHook : IXposedHookLoadPackage {
+    companion object {
+        const val MANAGER_APP_PACKAGE_NAME = "com.steadywj.wjfakelocation"
+    }
     private val tag = "[WJFakeLocation-Hook]"
 
     lateinit var context: Context
