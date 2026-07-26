@@ -27,7 +27,7 @@ class PerformanceMonitor @Inject constructor() {
     val metrics: StateFlow<PerformanceMetrics> = _metrics.asStateFlow()
     
     /** 方法调用记录 */
-    private val methodTimings = mutableMapOf<String, MutableList<Long>>()
+    private val methodTimings = mutableMapOf<String, MutableList<Double>>()
     
     /** 是否启用监控 */
     var isEnabled = true
