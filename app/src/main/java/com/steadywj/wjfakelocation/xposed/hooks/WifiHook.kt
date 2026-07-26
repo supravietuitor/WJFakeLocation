@@ -43,10 +43,10 @@ class WifiHook : IXposedHookLoadPackage {
             val clazz = XposedHelpers.findClass(WifiManager::class.java.name, lpparam.classLoader)
             
             XposedBridge.hookAllMethods(clazz, "getScanResults", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     try {
@@ -55,7 +55,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeWifiList
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假 WiFi 列表失败：${e.message}")
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                 }
             })
@@ -72,10 +72,10 @@ class WifiHook : IXposedHookLoadPackage {
             val clazz = XposedHelpers.findClass(WifiManager::class.java.name, lpparam.classLoader)
             
             XposedBridge.hookAllMethods(clazz, "getConnectionInfo", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     try {
@@ -84,7 +84,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeInfo
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假连接信息失败：${e.message}")
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                 }
             })
@@ -101,10 +101,10 @@ class WifiHook : IXposedHookLoadPackage {
             val clazz = XposedHelpers.findClass(WifiManager::class.java.name, lpparam.classLoader)
             
             XposedBridge.hookAllMethods(clazz, "getConfiguredNetworks", object : XC_MethodReplacement() {
-                @Throws(Throwable::class.java)
+                @Throws(Throwable::class)
                 override fun replaceHookedMethod(param: MethodHookParam): Any? {
                     if (!isFakeWifiEnabled()) {
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                     
                     try {
@@ -113,7 +113,7 @@ class WifiHook : IXposedHookLoadPackage {
                         return fakeConfigs
                     } catch (e: Exception) {
                         XposedBridge.log("[WifiHook] 创建假配置网络失败：${e.message}")
-                        return param.method.invoke(param.thisObject, *param.args)
+                        return XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
                     }
                 }
             })
@@ -176,7 +176,7 @@ class WifiHook : IXposedHookLoadPackage {
     private fun createFakeConnectionInfo(): WifiInfo {
         val primaryWifi = FakeWifiInfo.getPrimaryWifi()
         
-        val wifiInfo = WifiInfo()
+        val wifiInfo = XposedHelpers.newInstance(WifiInfo::class.java)
         
         // SSID
         XposedHelpers.callMethod(wifiInfo, "setSSID", "\"${primaryWifi.ssid}\"")
