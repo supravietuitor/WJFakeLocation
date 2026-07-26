@@ -103,7 +103,7 @@ class MapCacheManager @Inject constructor(
     }
     
     private fun generateCacheKey(zoom: Int, x: Int, y: Int): String {
-        return "tile_${zoom}_$x_$y"
+        return "tile_${zoom}_${x}_${y}"
     }
     
     private fun getDiskCacheFile(key: String): File {
