@@ -2,7 +2,7 @@
 package com.steadywj.wjfakelocation.domain.service
 
 import android.content.Context
-import com.amap.api.maps2d.AMap
+import com.amap.api.maps.AMap
 import kotlinx.coroutines.flow.Flow
 
 /**
