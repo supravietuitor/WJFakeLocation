@@ -88,7 +88,7 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             val updated = favorite.copy(updatedAt = System.currentTimeMillis())
             favoritesRepository.updateFavorite(updated)
-            _uiState.value = _uiState.value.copy(showSuccessMessage = "Done)
+            _uiState.value = _uiState.value.copy(showSuccessMessage = "Done")
         }
     }
 
@@ -99,7 +99,7 @@ class FavoritesViewModel @Inject constructor(
     fun deleteFavorite(favorite: FavoriteLocation) {
         viewModelScope.launch {
             favoritesRepository.deleteFavorite(favorite)
-            _uiState.value = _uiState.value.copy(showSuccessMessage = "Done)
+            _uiState.value = _uiState.value.copy(showSuccessMessage = "Done")
         }
     }
 
