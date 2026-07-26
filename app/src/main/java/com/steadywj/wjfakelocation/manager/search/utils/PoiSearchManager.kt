@@ -2,8 +2,8 @@ package com.steadywj.wjfakelocation.manager.search.utils
 
 import android.content.Context
 import com.amap.api.services.core.LatLonPoint
-import com.amap.api.services.poi.PoiItem
-import com.amap.api.services.poi.PoiSearch
+import com.amap.api.services.poisearch.PoiItem
+import com.amap.api.services.poisearch.PoiSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
