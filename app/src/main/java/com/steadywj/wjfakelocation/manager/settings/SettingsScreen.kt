@@ -39,7 +39,7 @@ fun SettingsScreen(
                 title = { Text(stringResource(id = R.string.nav_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Navigate back")
                     }
                 }
             )
@@ -51,7 +51,6 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // 定位设置分组
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,47 +67,42 @@ fun SettingsScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // 精度设置
                     SettingSwitchItem(
                         title = stringResource(id = R.string.settings_use_accuracy),
-                        subtitle = if (settings.useAccuracy) "${settings.accuracy}�? else "关闭",
+                        subtitle = if (settings.useAccuracy) "${settings.accuracy}m" else "Not set",
                         checked = settings.useAccuracy,
                         onCheckedChange = { viewModel.updateAccuracy(it, settings.accuracy) }
                     )
                     
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     
-                    // 海拔设置
                     SettingSwitchItem(
                         title = stringResource(id = R.string.settings_use_altitude),
-                        subtitle = if (settings.useAltitude) "${settings.altitude}�? else "关闭",
+                        subtitle = if (settings.useAltitude) "${settings.altitude}m" else "Not set",
                         checked = settings.useAltitude,
                         onCheckedChange = { viewModel.updateAltitude(it, settings.altitude) }
                     )
                     
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     
-                    // 随机偏移
                     SettingSwitchItem(
                         title = stringResource(id = R.string.settings_use_randomize),
-                        subtitle = if (settings.useRandomize) "半径${settings.randomizeRadius}�? else "关闭",
+                        subtitle = if (settings.useRandomize) "Radius: ${settings.randomizeRadius}m" else "Not set",
                         checked = settings.useRandomize,
                         onCheckedChange = { viewModel.updateRandomize(it, settings.randomizeRadius) }
                     )
                     
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     
-                    // 速度设置
                     SettingSwitchItem(
                         title = stringResource(id = R.string.settings_use_speed),
-                        subtitle = if (settings.useSpeed) "${settings.speed}�?�? else "关闭",
+                        subtitle = if (settings.useSpeed) "${settings.speed}km/h" else "Not set",
                         checked = settings.useSpeed,
                         onCheckedChange = { viewModel.updateSpeed(it, settings.speed) }
                     )
                 }
             }
             
-            // 情景模式
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,7 +113,7 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "情景模式",
+                        text = "Profile Management",
                         style = MaterialTheme.typography.titleMedium
                     )
                     
@@ -133,24 +127,21 @@ fun SettingsScreen(
                             onClick = { showProfileDialog = true },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("保存模式")
+                            Text("Save Profile")
                         }
                         
                         OutlinedButton(
                             onClick = {
-                                // 实现加载模式逻辑，可显示模式选择对话�?
-                                // TODO: 添加模式选择对话�?UI
                                 showProfileDialog = true
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("加载模式")
+                            Text("Load Profile")
                         }
                     }
                 }
             }
             
-            // API Key 配置
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,13 +170,12 @@ fun SettingsScreen(
                         onClick = onNavigateToApiKeySettings,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("配置 API Key")
+                        Text("Configure API Key")
                     }
                 }
             }
         }
         
-        // 显示成功提示
         uiState.showSuccessMessage?.let { message ->
             Snackbar(
                 modifier = Modifier
@@ -193,7 +183,7 @@ fun SettingsScreen(
                     .padding(16.dp),
                 action = {
                     TextButton(onClick = { viewModel.clearMessage() }) {
-                        Text("关闭")
+                        Text("Dismiss")
                     }
                 }
             ) {
