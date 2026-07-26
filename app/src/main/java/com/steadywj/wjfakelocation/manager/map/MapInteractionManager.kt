@@ -55,7 +55,7 @@ class MapInteractionManager @Inject constructor() {
                 aMap.projection.fromScreenLocation(
                     android.graphics.Point(screenX.toInt(), screenY.toInt())
                 )?.let { latLng ->
-                    addMarkerAtLocation(aMap, latLng, "Done)
+                    addMarkerAtLocation(aMap, latLng, "Done")
                 }
             }
             
