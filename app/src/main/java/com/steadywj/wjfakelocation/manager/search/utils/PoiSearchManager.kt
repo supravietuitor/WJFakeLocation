@@ -2,7 +2,6 @@ package com.steadywj.wjfakelocation.manager.search.utils
 
 import android.content.Context
 import com.amap.api.services.core.LatLonPoint
-import com.amap.api.services.poisearch.PoiItem
 import com.amap.api.services.poisearch.PoiResult
 import com.amap.api.services.poisearch.PoiSearch
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +36,21 @@ class PoiSearchManager @Inject constructor(
                     override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
                             val pois = result.pois.mapNotNull { poiItem ->
-                                poiItem.toPoiResult()
+                                try {
+                                    PoiResult(
+                                        id = poiItem.poiId,
+                                        name = poiItem.title,
+                                        type = poiItem.type,
+                                        address = poiItem.snippet ?: "",
+                                        latitude = poiItem.latLonPoint.latitude,
+                                        longitude = poiItem.latLonPoint.longitude,
+                                        distance = poiItem.distance,
+                                        tel = poiItem.tel,
+                                        rating = null
+                                    )
+                                } catch (e: Exception) {
+                                    null
+                                }
                             }
                             trySend(pois)
                         } else {
@@ -45,7 +58,7 @@ class PoiSearchManager @Inject constructor(
                         }
                     }
 
-                    override fun onPoiItemSearched(poiItem: PoiItem?, errorCode: Int) {
+                    override fun onPoiItemSearched(poiItem: com.amap.api.services.poisearch.PoiItem?, errorCode: Int) {
                     }
                 })
 
@@ -74,7 +87,21 @@ class PoiSearchManager @Inject constructor(
                     override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
                             val pois = result.pois.mapNotNull { poiItem ->
-                                poiItem.toPoiResult()
+                                try {
+                                    PoiResult(
+                                        id = poiItem.poiId,
+                                        name = poiItem.title,
+                                        type = poiItem.type,
+                                        address = poiItem.snippet ?: "",
+                                        latitude = poiItem.latLonPoint.latitude,
+                                        longitude = poiItem.latLonPoint.longitude,
+                                        distance = poiItem.distance,
+                                        tel = poiItem.tel,
+                                        rating = null
+                                    )
+                                } catch (e: Exception) {
+                                    null
+                                }
                             }
                             trySend(pois)
                         } else {
@@ -82,7 +109,7 @@ class PoiSearchManager @Inject constructor(
                         }
                     }
 
-                    override fun onPoiItemSearched(poiItem: PoiItem?, errorCode: Int) {
+                    override fun onPoiItemSearched(poiItem: com.amap.api.services.poisearch.PoiItem?, errorCode: Int) {
                     }
                 })
 
@@ -130,18 +157,4 @@ enum class PoiType(val code: String, val displayName: String) {
     GOVERNMENT("government", "Government"),
     TOURIST("tourist", "Tourist"),
     DEFAULT("", "Default")
-}
-
-fun PoiItem.toPoiResult(): PoiResult {
-    return PoiResult(
-        id = this.poiId,
-        name = this.title,
-        type = this.type,
-        address = this.snippet ?: this.address ?: "",
-        latitude = this.latLonPoint.latitude,
-        longitude = this.latLonPoint.longitude,
-        distance = this.distance,
-        tel = this.tel,
-        rating = null
-    )
 }
