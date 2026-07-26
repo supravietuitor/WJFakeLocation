@@ -2,7 +2,6 @@
 package com.steadywj.wjfakelocation
 
 import android.app.Application
-import com.amap.api.maps.AMapInterface
 import com.amap.api.services.core.ServiceSettings
 import com.baidu.mapapi.SDKInitializer
 import com.steadywj.wjfakelocation.common.WJLogger
@@ -39,9 +38,6 @@ class WJFakeLocationApplication : Application() {
         try {
             // 初始化地图服务设置
             ServiceSettings.getInstance()
-            
-            // 预加载地图接口（可选，根据实际需求）
-            AMapInterface.getInstance(this)
             
             WJLogger.d("高德地图 SDK 初始化成功")
         } catch (e: Exception) {
