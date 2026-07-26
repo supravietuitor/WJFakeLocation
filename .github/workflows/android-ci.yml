@@ -4,6 +4,7 @@
 name: Android CI/CD + Code Review
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main", "develop" ]
     tags:
