@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,7 +51,7 @@ class CloudSyncService @Inject constructor(
             try {
                 _syncState.value = SyncState.SYNCING
 
-                val localFavorites = favoritesRepository.allFavorites.value
+                val localFavorites = favoritesRepository.allFavorites.first()
 
                 supabase.from("favorites")
                     .upsert(
