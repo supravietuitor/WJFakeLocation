@@ -38,7 +38,7 @@ class WJFakeLocationApplication : Application() {
     private fun initAMapSDK() {
         try {
             // 初始化地图服务设置
-            ServiceSettings.getInstance(this)
+            ServiceSettings.getInstance()
             
             // 预加载地图接口（可选，根据实际需求）
             AMapInterface.getInstance(this)
