@@ -10,7 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.baidu.mapapi.map.BaiduMap
 import com.baidu.mapapi.map.MapStatusUpdateFactory
 import com.baidu.mapapi.map.MapView
@@ -21,14 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * 百度地图 MapView 包装�?
- * 
- * 功能:
- * - MapView 生命周期管理
- * - Compose 互操�?
- * - 加载进度反馈
- */
 @Composable
 fun BaiduMapView(
     modifier: Modifier = Modifier,
@@ -44,28 +39,22 @@ fun BaiduMapView(
         AndroidView(
             factory = { ctx ->
                 MapView(ctx).apply {
-                    // 初始化地�?
                     val baiduMap = map
                     
-                    // 设置初始位置
                     val currentLatLng = LatLng(initialLatitude, initialLongitude)
                     val update = MapStatusUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel)
                     baiduMap.setMapStatus(update)
                     
-                    // 启用定位图层
                     baiduMap.isMyLocationEnabled = true
                     
-                    // 标记加载完成
                     isMapLoaded = true
                     
-                    // 回调
                     onMapReady?.invoke(baiduMap)
                 }
             },
             modifier = Modifier.fillMaxSize()
         )
         
-        // 显示加载进度�?
         if (!isMapLoaded) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -75,9 +64,6 @@ fun BaiduMapView(
     }
 }
 
-/**
- * 百度地图标记�?
- */
 @Composable
 fun BaiduMapMarker(
     latitude: Double,
@@ -100,7 +86,6 @@ fun BaiduMapMarker(
             
             marker = baiduMap.addOverlay(markerOptions) as? Marker
             
-            // 设置点击监听
             if (onClick != null) {
                 baiduMap.setOnMarkerClickListener { clickedMarker ->
                     if (clickedMarker == marker) {
@@ -119,32 +104,27 @@ fun BaiduMapMarker(
     }
 }
 
-/**
- * 百度地图生命周期管理
- */
 @Composable
 fun rememberBaiduMapLifecycle(mapView: MapView?) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     
     DisposableEffect(lifecycleOwner, mapView) {
-        mapView?.let { map ->
-            // onCreate
-            map.onCreate(LocalContext.current, Bundle())
+        val observer = if (mapView != null) {
+            mapView.onCreate(context, Bundle())
             
-            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            LifecycleEventObserver { _, event ->
                 when (event) {
-                    androidx.lifecycle.Lifecycle.Event.ON_RESUME -> map.onResume()
-                    androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> map.onPause()
-                    androidx.lifecycle.Lifecycle.Event.ON_DESTROY -> map.onDestroy()
+                    Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                    Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                    Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
                     else -> {}
                 }
-            }
-            
-            lifecycleOwner.lifecycle.addObserver(observer)
-            
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
+            }.also { lifecycleOwner.lifecycle.addObserver(it) }
+        } else null
+        
+        onDispose {
+            observer?.let { lifecycleOwner.lifecycle.removeObserver(it) }
         }
     }
 }
