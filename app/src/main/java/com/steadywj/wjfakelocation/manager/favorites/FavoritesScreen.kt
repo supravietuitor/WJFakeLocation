@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.steadywj.wjfakelocation.R
 import com.steadywj.wjfakelocation.data.model.FavoriteLocation
-import com.steadywj.wjfakelocation.manager.favorites.FavoritesViewModel
+import com.steadywj.wjfakelocation.manager.favorites.viewmodel.FavoritesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,68 +63,69 @@ fun FavoritesScreen(
             }
         }
     ) { paddingValues ->
-        if (favorites.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        Box(Modifier.fillMaxSize()) {
+            if (favorites.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Card(
+                        modifier = Modifier.padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        Text(
-                            text = stringResource(id = R.string.favorites_empty),
-                            style = MaterialTheme.typography.bodyLarge
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.favorites_empty),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(favorites, key = { it.id }) { favorite ->
+                        FavoriteItem(
+                            favorite = favorite,
+                            onEdit = {
+                                editingFavorite = favorite
+                                showEditDialog = true
+                            },
+                            onDelete = {
+                                viewModel.deleteFavorite(favorite)
+                            }
                         )
                     }
                 }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(favorites, key = { it.id }) { favorite ->
-                    FavoriteItem(
-                        favorite = favorite,
-                        onEdit = {
-                            editingFavorite = favorite
-                            showEditDialog = true
-                        },
-                        onDelete = {
-                            viewModel.deleteFavorite(favorite)
+            
+            uiState.showSuccessMessage?.let { message ->
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    action = {
+                        TextButton(onClick = { viewModel.clearMessage() }) {
+                            Text("关闭")
                         }
-                    )
-                }
-            }
-        }
-        
-        // 显示成功提示
-        uiState.showSuccessMessage?.let { message ->
-            Snackbar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                action = {
-                    TextButton(onClick = { viewModel.clearMessage() }) {
-                        Text("关闭")
                     }
+                ) {
+                    Text(message)
                 }
-            ) {
-                Text(message)
-            }
-            LaunchedEffect(Unit) {
-                kotlinx.coroutines.delay(2000)
-                viewModel.clearMessage()
+                LaunchedEffect(Unit) {
+                    kotlinx.coroutines.delay(2000)
+                    viewModel.clearMessage()
+                }
             }
         }
     }
