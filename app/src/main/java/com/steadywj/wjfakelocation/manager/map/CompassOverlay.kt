@@ -81,16 +81,7 @@ class CompassOverlay @Inject constructor() : SensorEventListener {
     }
     
     private fun updateCompassRotation(heading: Float) {
-        compassMarker?.let { marker ->
-            val opts = marker.options
-            marker.setOptions(
-                opts.title(opts.title)
-                    .snippet(opts.snippet)
-                    .anchor(opts.anchorU, opts.anchorV)
-            )
-            val rotateAngle = heading
-            marker.setRotateAngle(rotateAngle)
-        }
+        compassMarker?.setRotateAngle(heading)
     }
     
     fun destroy() {
