@@ -258,7 +258,7 @@ class CloudSyncService @Inject constructor(
 /**
  * Supabase 收藏夹 DTO
  */
-kotlinx.serialization.Serializable
+@kotlinx.serialization.Serializable
 data class FavoriteSupabaseDto(
     val id: Long? = null,
     val device_id: String,
