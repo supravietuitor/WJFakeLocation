@@ -176,7 +176,7 @@ class WifiHook : IXposedHookLoadPackage {
     private fun createFakeConnectionInfo(): Any? {
         val primaryWifi = FakeWifiInfo.getPrimaryWifi()
         
-        val wifiInfo = XposedHelpers.newInstance(WifiInfo::class.java)
+        val wifiInfo: Any = XposedHelpers.newInstance(WifiInfo::class.java) ?: error("Failed to create WifiInfo")
         
         // SSID
         XposedHelpers.callMethod(wifiInfo, "setSSID", "\"${primaryWifi.ssid}\"")
