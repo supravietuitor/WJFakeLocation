@@ -2,7 +2,7 @@
 package com.steadywj.wjfakelocation
 
 import android.app.Application
-import com.amap.api.maps2d.AMapInterface
+import com.amap.api.maps.AMapInterface
 import com.amap.api.services.core.ServiceSettings
 import com.baidu.mapapi.SDKInitializer
 import com.steadywj.wjfakelocation.common.WJLogger
