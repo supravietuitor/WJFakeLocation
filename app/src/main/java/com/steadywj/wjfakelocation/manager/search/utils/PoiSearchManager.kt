@@ -72,7 +72,7 @@ class PoiSearchManager @Inject constructor(
                         }
                     }
 
-                    override fun onPoiItemSearched(poiItem: com.amap.api.services.poisearch.PoiItem?, errorCode: Int) {
+                    override fun onPoiItemSearched(poiItem: Any?, errorCode: Int) {
                     }
                 })
 
@@ -138,7 +138,7 @@ class PoiSearchManager @Inject constructor(
                         }
                     }
 
-                    override fun onPoiItemSearched(poiItem: com.amap.api.services.poisearch.PoiItem?, errorCode: Int) {
+                    override fun onPoiItemSearched(poiItem: Any?, errorCode: Int) {
                     }
                 })
 
