@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.steadywj.wjfakelocation.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFavoriteDialog(
     onDismiss: () -> Unit,
