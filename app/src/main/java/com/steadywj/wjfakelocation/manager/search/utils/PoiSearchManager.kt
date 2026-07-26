@@ -3,6 +3,7 @@ package com.steadywj.wjfakelocation.manager.search.utils
 import android.content.Context
 import com.amap.api.services.core.LatLonPoint
 import com.amap.api.services.poisearch.PoiItem
+import com.amap.api.services.poisearch.PoiResult
 import com.amap.api.services.poisearch.PoiSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -25,17 +26,15 @@ class PoiSearchManager @Inject constructor(
     ): Flow<List<PoiResult>> = callbackFlow {
         withContext(Dispatchers.IO) {
             try {
-                val poiSearch = PoiSearch(context, "")
                 val query = PoiSearch.Query("", type.code, "")
-
                 query.setPageSize(20)
                 query.setPageNum(1)
 
-                poiSearch.query = query
-                poiSearch.setBound(LatLonPoint(latitude, longitude), radius)
+                val poiSearch = PoiSearch(context, query)
+                poiSearch.setBound(PoiSearch.SearchBound(LatLonPoint(latitude, longitude), radius))
 
                 poiSearch.setOnPoiSearchListener(object : PoiSearch.OnPoiSearchListener {
-                    override fun onPoiSearched(result: PoiSearch.Result?, errorCode: Int) {
+                    override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
                             val pois = result.pois.mapNotNull { poiItem ->
                                 poiItem.toPoiResult()
@@ -65,16 +64,14 @@ class PoiSearchManager @Inject constructor(
     ): Flow<List<PoiResult>> = callbackFlow {
         withContext(Dispatchers.IO) {
             try {
-                val poiSearch = PoiSearch(context, keyword)
                 val query = PoiSearch.Query(keyword, "", city)
-
                 query.setPageSize(20)
                 query.setPageNum(1)
 
-                poiSearch.query = query
+                val poiSearch = PoiSearch(context, query)
 
                 poiSearch.setOnPoiSearchListener(object : PoiSearch.OnPoiSearchListener {
-                    override fun onPoiSearched(result: PoiSearch.Result?, errorCode: Int) {
+                    override fun onPoiSearched(result: PoiResult?, errorCode: Int) {
                         if (errorCode == 0 && result != null) {
                             val pois = result.pois.mapNotNull { poiItem ->
                                 poiItem.toPoiResult()
