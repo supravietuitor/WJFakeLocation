@@ -13,12 +13,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 百度地图管理�?
+ * ç™¾åº¦åœ°å›¾ç®¡ç†å™?
  * 
- * 功能:
- * - BD-09 �?WGS-84 坐标转换
- * - 地理编码搜索
- * - 逆地理编�?
+ * åŠŸèƒ½:
+ * - BD-09 â†?WGS-84 åæ ‡è½¬æ¢
+ * - åœ°ç†ç¼–ç æœç´¢
+ * - é€†åœ°ç†ç¼–ç ?
  */
 @Singleton
 class BaiduMapManager @Inject constructor(
@@ -26,31 +26,31 @@ class BaiduMapManager @Inject constructor(
 ) {
     
     /**
-     * BD-09 �?WGS-84
-     * 百度坐标�?�?火星坐标�?�?GPS 坐标�?
+     * BD-09 è½?WGS-84
+     * ç™¾åº¦åæ ‡ç³?â†?ç«æ˜Ÿåæ ‡ç³?â†?GPS åæ ‡ç³?
      */
     fun bd09ToWgs84(bdLat: Double, bdLng: Double): Pair<Double, Double> {
-        // BD-09 �?GCJ-02
+        // BD-09 â†?GCJ-02
         val (gcjLat, gcjLng) = bd09ToGcj02(bdLat, bdLng)
         
-        // GCJ-02 �?WGS-84
+        // GCJ-02 â†?WGS-84
         return gcj02ToWgs84(gcjLat, gcjLng)
     }
     
     /**
-     * WGS-84 �?BD-09
-     * GPS 坐标�?�?火星坐标�?�?百度坐标�?
+     * WGS-84 è½?BD-09
+     * GPS åæ ‡ç³?â†?ç«æ˜Ÿåæ ‡ç³?â†?ç™¾åº¦åæ ‡ç³?
      */
     fun wgs84ToBd09(wgsLat: Double, wgsLng: Double): Pair<Double, Double> {
-        // WGS-84 �?GCJ-02
+        // WGS-84 â†?GCJ-02
         val (gcjLat, gcjLng) = wgs84ToGcj02(wgsLat, wgsLng)
         
-        // GCJ-02 �?BD-09
+        // GCJ-02 â†?BD-09
         return gcj02ToBd09(gcjLat, gcjLng)
     }
     
     /**
-     * BD-09 �?GCJ-02
+     * BD-09 è½?GCJ-02
      */
     private fun bd09ToGcj02(bdLat: Double, bdLng: Double): Pair<Double, Double> {
         val xPi = Math.PI * 3000.0 / 180.0
@@ -66,7 +66,7 @@ class BaiduMapManager @Inject constructor(
     }
     
     /**
-     * GCJ-02 �?BD-09
+     * GCJ-02 è½?BD-09
      */
     private fun gcj02ToBd09(gcjLat: Double, gcjLng: Double): Pair<Double, Double> {
         val xPi = Math.PI * 3000.0 / 180.0
@@ -80,21 +80,21 @@ class BaiduMapManager @Inject constructor(
     }
     
     /**
-     * GCJ-02 �?WGS-84
+     * GCJ-02 è½?WGS-84
      */
     private fun gcj02ToWgs84(gcjLat: Double, gcjLng: Double): Pair<Double, Double> {
         return com.steadywj.wjfakelocation.xposed.common.LocationUtil.gcj02ToWgs84(gcjLat, gcjLng)
     }
     
     /**
-     * WGS-84 �?GCJ-02
+     * WGS-84 è½?GCJ-02
      */
     private fun wgs84ToGcj02(wgsLat: Double, wgsLng: Double): Pair<Double, Double> {
         return com.steadywj.wjfakelocation.xposed.common.LocationUtil.wgs84ToGcj02(wgsLat, wgsLng)
     }
     
     /**
-     * 地理编码搜索（地址转坐标）
+     * åœ°ç†ç¼–ç æœç´¢ï¼ˆåœ°å€è½¬åæ ‡ï¼‰
      */
     fun geocodeAddress(address: String): Flow<Result<Pair<Double, Double>>> = callbackFlow {
         try {
@@ -106,18 +106,18 @@ class BaiduMapManager @Inject constructor(
                         val latLng = result.location
                         trySend(Result.success(latLng.latitude to latLng.longitude))
                     } else {
-                        trySend(Result.failure(Exception("地理编码失败")))
+                        trySend(Result.failure(Exception("åœ°ç†ç¼–ç å¤±è´¥")))
                     }
                     close()
                 }
                 
                 override fun onGetReverseGeoCodeResult(result: Any?) {
-                    // 不使用逆地理编�?
+                    // ä¸ä½¿ç”¨é€†åœ°ç†ç¼–ç ?
                 }
             })
             
-            // 执行地理编码
-            geoCoder.geoCodeLocation(address, "全国")
+            // æ‰§è¡Œåœ°ç†ç¼–ç 
+            geoCoder.geoCodeLocation(address, "å…¨å›½")
         } catch (e: Exception) {
             trySend(Result.failure(e))
             close()
@@ -127,7 +127,7 @@ class BaiduMapManager @Inject constructor(
     }
     
     /**
-     * 逆地理编码（坐标转地址�?
+     * é€†åœ°ç†ç¼–ç ï¼ˆåæ ‡è½¬åœ°å€ï¼?
      */
     fun reverseGeocode(latitude: Double, longitude: Double): Flow<Result<String>> = callbackFlow {
         try {
@@ -135,20 +135,20 @@ class BaiduMapManager @Inject constructor(
             
             geoCoder.setOnGetReverseGeoCodeResultListener(object : OnGetGeoCoderResultListener {
                 override fun onGetReverseGeoCodeResult(result: Any?) {
-                    // 适配百度地图的逆地理编码结�?
+                    // é€‚é…ç™¾åº¦åœ°å›¾çš„é€†åœ°ç†ç¼–ç ç»“æž?
                     try {
                         if (result != null) {
-                            // 使用反射获取 address 字段
+                            // ä½¿ç”¨åå°„èŽ·å– address å­—æ®µ
                             val addressField = result.javaClass.getDeclaredMethod("getAddress")
                             val address = addressField.invoke(result) as? String
                             
                             if (!address.isNullOrBlank()) {
                                 trySend(Result.success(address))
                             } else {
-                                trySend(Result.failure(Exception("无法解析地址")))
+                                trySend(Result.failure(Exception("æ— æ³•è§£æžåœ°å€")))
                             }
                         } else {
-                            trySend(Result.failure(Exception("逆地理编码结果为�?)))
+                            trySend(Result.failure(Exception("Done)
                         }
                     } catch (e: Exception) {
                         trySend(Result.failure(e))
@@ -158,7 +158,7 @@ class BaiduMapManager @Inject constructor(
                 }
                 
                 override fun onGetGeoCodeResult(result: GeoCodeResult?) {
-                    // 不使�?
+                    // ä¸ä½¿ç”?
                 }
             })
             
