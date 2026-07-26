@@ -3,7 +3,6 @@ package com.steadywj.wjfakelocation.xposed.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.steadywj.wjfakelocation.data.SHARED_PREFS_FILE
 import de.robv.android.xposed.XposedBridge
 
 /**
@@ -13,6 +12,7 @@ import de.robv.android.xposed.XposedBridge
 object PreferencesUtil {
     
     private const val TAG = "[PreferencesUtil]"
+    private const val SHARED_PREFS_FILE = "wjfakelocation_shared_prefs"
     private var prefs: SharedPreferences? = null
     
     /**
@@ -27,9 +27,9 @@ object PreferencesUtil {
                 Context.CONTEXT_IGNORE_SECURITY
             ).getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_WORLD_READABLE)
             
-            XposedBridge.log("$tag SharedPreferences initialized successfully")
+            XposedBridge.log("$TAG SharedPreferences initialized successfully")
         } catch (e: Exception) {
-            XposedBridge.log("$tag Failed to initialize SharedPreferences: ${e.message}")
+            XposedBridge.log("$TAG Failed to initialize SharedPreferences: ${e.message}")
             prefs = null
         }
     }
@@ -45,8 +45,8 @@ object PreferencesUtil {
      * 获取选中的位置
      */
     fun getSelectedLocation(): Pair<Double, Double>? {
-        val lat = prefs?.getDouble("selected_latitude", Double.MIN_VALUE) ?: Double.MIN_VALUE
-        val lng = prefs?.getDouble("selected_longitude", Double.MIN_VALUE) ?: Double.MIN_VALUE
+        val lat = prefs?.getFloat("selected_latitude", Double.MIN_VALUE.toFloat())?.toDouble() ?: Double.MIN_VALUE
+        val lng = prefs?.getFloat("selected_longitude", Double.MIN_VALUE.toFloat())?.toDouble() ?: Double.MIN_VALUE
         
         return if (lat != Double.MIN_VALUE && lng != Double.MIN_VALUE) {
             Pair(lat, lng)
